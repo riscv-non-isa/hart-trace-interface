@@ -1,4 +1,4 @@
-= Host Trace Interface
+= Hart Trace Interface
 
 == License
 
@@ -42,13 +42,13 @@ To build the document, you'll need the following tools installed on your system:
 === Cloning the Repository
 
 ```shell
-git clone --recurse-submodules https://github.com/riscv-non-isa/host-trace-interface.git
+git clone --recurse-submodules https://github.com/riscv-non-isa/hart-trace-interface.git
 ```
 
 All in one single line:
 
 ```shell
-git clone --recurse-submodules https://github.com/riscv-non-isa/host-trace-interface && cd host-trace-interface && git submodule update --init --recursive
+git clone --recurse-submodules https://github.com/riscv-non-isa/hart-trace-interface && cd hart-trace-interface && git submodule update --init --recursive
 
 ```
 
