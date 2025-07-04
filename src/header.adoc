@@ -1,10 +1,10 @@
-= RISC-V Example Specification Document (Zexmpl)
-Authors: Author 1, Author 2
+= RISC-V Hart to Trace Interface Specification
+Authors: Iain Robertson
 include::../docs-resources/global-config.adoc[]
 :docgroup: RISC-V Task Group
-:description: RISC-V Example Specification Document (Zexmpl)
-:revdate: 1/2023
-:revnumber: 1.0
+:description: RISC-V Hart to Trace Interface Specification
+:revdate: 2/7/2025
+:revnumber: 0.1
 :revremark: This document is under development. Expect potential changes. Visit http://riscv.org/spec-state for further details.
 :revinfo:
 :preface-title: Preamble
@@ -39,16 +39,6 @@ endif::[]
 :xrefstyle: short
 
 [preface]
-== List of figures
-list-of::image[hide_empty_section=true, enhanced_rendering=true]
-
-[preface]
-== List of tables
-list-of::table[hide_empty_section=true, enhanced_rendering=true]
-
-[preface]
-== List of listings
-list-of::listing[hide_empty_section=true, enhanced_rendering=true]
 
 [WARNING]
 .This document is in the link:http://riscv.org/spec-state[Development state]
@@ -67,12 +57,14 @@ https://creativecommons.org/licenses/by/4.0/.
 
 Copyright 2025 by RISC-V International.
 
+[colophon]
+
+*_Preface to Version TBD_*
+Chapter 2 of this document is identical in content to Chapter 4 of *Version 20250616* of the https://github.com/riscv-non-isa/riscv-trace-spec/releases/latest/[Efficient Trace for RISC-V Specification], which is the ratified 2.0 specification with some informative clarifications and corrections.  
 [preface]
 include::contributors.adoc[]
 
 include::intro.adoc[]
-include::chapter2.adoc[]
+include::hti.adoc[]
 
-// The index must precede the bibliography
-include::index.adoc[]
-include::bibliography.adoc[]
+
