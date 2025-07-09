@@ -75,7 +75,7 @@ jobs:
       - name: Upload PDF Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: hart-trace-interface-${{ env.SHORT_SHA }}.pdf
+          name: hart-trace-interface${{ env.SHORT_SHA }}.pdf
           path: ${{ github.workspace }}/build/hart-trace-interface.pdf
           retention-days: 7
 
@@ -83,7 +83,7 @@ jobs:
       - name: Upload HTML Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: hart-trace-interface-${{ env.SHORT_SHA }}.html
+          name: hart-trace-interface${{ env.SHORT_SHA }}.html
           path: ${{ github.workspace }}/build/hart-trace-interface.html
           retention-days: 7
           
