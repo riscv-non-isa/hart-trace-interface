@@ -60,5 +60,3 @@ in the RISC-V ISA
 
 Items in _italics_ with names ending _’_p’_ refer to parameters either
 built into the hardware or configurable hardware values.
-
-

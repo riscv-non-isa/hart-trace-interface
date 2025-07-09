@@ -66,5 +66,3 @@ include::contributors.adoc[]
 
 include::intro.adoc[]
 include::hti.adoc[]
-
-

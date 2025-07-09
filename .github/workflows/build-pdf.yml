@@ -86,7 +86,7 @@ jobs:
           name: hart-trace-interface${{ env.SHORT_SHA }}.html
           path: ${{ github.workspace }}/build/hart-trace-interface.html
           retention-days: 7
-          
+
       # Create Release
       - name: Create Release
         uses: softprops/action-gh-release@v1
