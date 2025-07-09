@@ -306,9 +306,9 @@ block.
 *itype* can be 3 or 4 bits wide. If _itype_width_p_ is 3, a single code
 (6) is used to indicate all uninferable jumps. This is simpler to
 implement, but precludes use of the implicit return mode (see
-<<sec:implicit-return>>), which requires jump types to be fully classified.  
-Note that when _itype_width_p_ is 3, *itype* = 0 is used for inferrable calls.  
-However, inferrable calls must still be the last instruction retired in a 
+<<sec:implicit-return>>), which requires jump types to be fully classified.
+Note that when _itype_width_p_ is 3, *itype* = 0 is used for inferrable calls.
+However, inferrable calls must still be the last instruction retired in a
 block, otherwise the block would not be comprised of contiguous instructions.
 
 Whilst *iaddr* is typically a virtual address, it does not affect the
@@ -419,7 +419,7 @@ and OR.
 ==== Optional sideband signals
 
 Optional sideband signals may be included to provide additional
-functionality, as described in 
+functionality, as described in
 <<tab:ingress-side-band>> and
 <<tab:egress-side-band>>.
 
@@ -496,7 +496,7 @@ cycle that Trace-off is asserted (subject to any optional filtering).
 It follows from this that:
 
 *  if tracing is enabled and trace-off occurs on the cycle before trace-on, then tracing will continue unimpeded (i.e. it stays on);
-* if tracing is disabled and trace-on and trace-off triggers occur simultaneously then only the instructions retired in that cycle will be traced. 
+* if tracing is disabled and trace-on and trace-off triggers occur simultaneously then only the instructions retired in that cycle will be traced.
 
 Trace-notify provides means to ensure that a specified instruction is
 explicitly reported (subject to any optional filtering). This capability
@@ -518,7 +518,7 @@ is sometimes known as a watchpoint.
 | **iretire**=3, **iaddr**=0x0940, **itype**=4
 |0946: *_c.bnez_* | **iretire**=1, **iaddr**=0x0946, **itype**=5
 |0988: *_lbu_* +
-098C: *_csrrw_* 
+098C: *_csrrw_*
 | **iretire**=4, **iaddr**=0x0988, **itype**=0
 |===
 

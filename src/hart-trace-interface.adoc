@@ -60,7 +60,7 @@ Copyright 2025 by RISC-V International.
 [colophon]
 
 *_Preface to Version TBD_*
-Chapter 2 of this document is identical in content to Chapter 4 of *Version 20250616* of the https://github.com/riscv-non-isa/riscv-trace-spec/releases/latest/[Efficient Trace for RISC-V Specification], which is the ratified 2.0 specification with some informative clarifications and corrections.  
+Chapter 2 of this document is identical in content to Chapter 4 of *Version 20250616* of the https://github.com/riscv-non-isa/riscv-trace-spec/releases/latest/[Efficient Trace for RISC-V Specification], which is the ratified 2.0 specification with some informative clarifications and corrections.
 [preface]
 include::contributors.adoc[]
 
