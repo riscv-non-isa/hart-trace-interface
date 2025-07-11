@@ -155,7 +155,7 @@ retire one instruction in a block. Replication as per OR (see
 BR group signals instead.
 
 "Special" instructions are those that require *itype* to be non-zero.
-////
+
 [[tab:common-ingress]]
 .Instruction interface signals
 [%autowidth,align="center",float="center",cols="<,<,<"options="header"]
@@ -188,14 +188,14 @@ sequentially inferable and may be treated as inferable by the encoder if
 the preceding *_auipc_*, *_lui_* or *_c.lui_* has been traced. Ignored
 for *itype* codes other than 6, 8, 10, 12 or 14.
 |===
-////
+
 <<tab:common-ingress>> and <<tab:multi-ingress>> list the signals in the
 interface designed to efficiently support retirement of multiple
 instructions per cycle. The following discussion describes the
 multiple-retirement behavior. However, for harts that can only retire
 one instruction at a time, the signalling can be simplified, and this is
 discussed subsequently in <<sec:single-retire>>.
-
+////
 [[tab:multi-ingress]]
 .Instruction interface signals - multiple retirement per block
 [%autowidth,align="center",float="center",cols="<,<,<",options="header"]
@@ -217,7 +217,7 @@ instruction is 2^*ilastsize*^ half-words.
 |*ilastsize*[_ilastsize_width_p-1_:0] | SR | The size of the last retired
 instruction in this block is 2^*ilastsize*^ half-words.
 |===
-
+////
 [[tab:itype3]]
 .Instruction Type (*itype*) encoding (_itype_width_p_ = 3)
 [align="center",float="center",cols="<,19%,<,~",options="header"]
