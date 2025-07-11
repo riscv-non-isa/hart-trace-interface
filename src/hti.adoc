@@ -195,7 +195,7 @@ instructions per cycle. The following discussion describes the
 multiple-retirement behavior. However, for harts that can only retire
 one instruction at a time, the signalling can be simplified, and this is
 discussed subsequently in <<sec:single-retire>>.
-////
+
 [[tab:multi-ingress]]
 .Instruction interface signals - multiple retirement per block
 [%autowidth,align="center",float="center",cols="<,<,<",options="header"]
@@ -237,7 +237,7 @@ retired instruction
                   Defined by *Zcmt* extension
 |7 | reserved | |
 |===
-
+////
 [[tab:itype4]]
 .Instruction Type (*itype*) encoding (_itype_width_p_ = 4)
 [%autowidth,align="center",float="center",cols="<,<,<,<",options="header"]
