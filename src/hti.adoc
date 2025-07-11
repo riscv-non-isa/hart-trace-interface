@@ -217,10 +217,10 @@ instruction is 2^*ilastsize*^ half-words.
 |*ilastsize*[_ilastsize_width_p-1_:0] | SR | The size of the last retired
 instruction in this block is 2^*ilastsize*^ half-words.
 |===
-////
+
 [[tab:itype3]]
 .Instruction Type (*itype*) encoding (_itype_width_p_ = 3)
-[align="center",float="center",cols="<,19%,<,~",options="header"]
+[%autowidth,align="center",float="center",cols="<,<,<,~",options="header"]
 |===
 | *Value* | *Name* | *Instruction* | *Condition/Notes*
 | 0 |Other | | Last instruction in the block matches none of the other instructions defined in this table
@@ -237,7 +237,7 @@ retired instruction
                   Defined by *Zcmt* extension
 |7 | reserved | |
 |===
-////
+
 [[tab:itype4]]
 .Instruction Type (*itype*) encoding (_itype_width_p_ = 4)
 [%autowidth,align="center",float="center",cols="<,<,<,<",options="header"]
