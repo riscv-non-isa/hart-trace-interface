@@ -104,7 +104,7 @@ encoder, and should have a minimal impact on trace efficiency as it is
 anticipated that consecutive execution will be the norm. Support for
 sequentially inferable jumps is optional.
 
-Jumps may optionally be further classified according to the recommended calling convention into _Calls_, _Returns_, _Co-routine swap_, and _other jumps with and without linkage_.  Full details are provided in the <<tab:itype4>> table.
+Jumps may optionally be further classified according to the recommended calling convention into _Calls_, _Returns_, _Co-routine swap_, and _other jumps with and without linkage_.  Full details are provided in <<tab:itype4>>.
 
 
 [[sec:relationship]]
@@ -134,7 +134,7 @@ so this configuration is not recommended.)
 === Instruction Trace Interface
 
 This section describes the interface between a RISC-V hart and the trace
-encoder that conveys the information described in the section
+encoder that conveys the information described in
 <<sec:InstructionInterfaceRequirements>>. Signals are assigned to one
 of the following groups:
 
@@ -228,7 +228,8 @@ instruction in this block is 2^*ilastsize*^ half-words.
    Note: ECALL, EBREAK or C.EBREAK instructions raise exceptions but do not retire
 |2 | Interrupt | | An interrupt that traps occurred following the last
 retired instruction
-|3 | Trap return | *RET | Return from exception or interrupt handler
+|3 | Trap return | MRET +
+                   SRET | Return from exception or interrupt handler
 |4 | Nontaken branch | <<itype_branch,Conditional branch>> | Not-taken direct, conditional branch
 |5 | Taken branch |  <<itype_branch,Conditional branch>> | Taken direct, conditional branch
 |6 | Uninferrable jump +
@@ -248,7 +249,8 @@ retired instruction
    Note: ECALL, EBREAK or C.EBREAK instructions raise exceptions but do not retire
 |2 | Interrupt | | An interrupt that traps occurred following the last
 retired instruction
-|3 | Trap return | *RET | Return from exception or interrupt handler
+|3 | Trap return | MRET +
+                   SRET | Return from exception or interrupt handler
 |4 | Nontaken branch | <<itype_branch,Conditional branch>> | Not-taken direct, conditional branch
 |5 | Taken branch |  <<itype_branch,Conditional branch>> | Taken direct, conditional branch
 | 6 +
@@ -264,13 +266,13 @@ retired instruction
                                 Expands to `JAL x1, offset` +
                                 Defined by <<zcmt,Zcmt>> extension
 |10 | Uninferable jump +
-      (without linkage) | C.JR rs +
-                          JALR rd, rs| rs != `link` +
-                                       rd = *x0* and rs != `link` +
-|11 | Inferrable jump | C.J +
-                        JAL rd +
-                        CM.JT| Expands to `JAL x0, offset` +
-                               rd = *x0* +
+      (without linkage) | JALR rd, rs +
+                          C.JR rs    | rd = *x0* and rs != `link` +
+                                       rs != `link` +
+|11 | Inferrable jump | JAL rd +
+                        C.J +
+                        CM.JT| rd = *x0* +
+                               Expands to `JAL x0, offset` +
                                Defined by <<zcmt,Zcmt>> extension
 |12 | Co-routine swap | JALR rd, rs +
                         C.JALR rs| rd = `link` and rs = `link` and rd != rs +
