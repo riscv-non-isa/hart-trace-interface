@@ -220,7 +220,7 @@ instruction in this block is 2^*ilastsize*^ half-words.
 
 [[tab:itype3]]
 .Instruction Type (*itype*) encoding (_itype_width_p_ = 3)
-[align="center",float="center",cols="<10%,<,<,~",options="header"]
+[align="center",float="center",cols="<20%,<,<,<~",options="header"]
 |===
 | *Value* | *Name* | *Instruction* | *Condition/Notes*
 | 0 |Other | | Last instruction in the block matches none of the other instructions defined in this table
@@ -241,7 +241,7 @@ retired instruction
 
 [[tab:itype4]]
 .Instruction Type (*itype*) encoding (_itype_width_p_ = 4)
-[align="center",float="center",cols="<10%,<,<,<~",options="header"]
+[align="center",float="center",cols="<20%,<,<,<~",options="header"]
 |===
 | *Value* | *Name* | *Instruction* | *Condition/Notes*
 | 0 |Other | | Last instruction in the block matches none of the other instructions defined in this table
