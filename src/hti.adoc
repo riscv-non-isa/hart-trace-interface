@@ -158,7 +158,7 @@ BR group signals instead.
 
 [[tab:common-ingress]]
 .Instruction interface signals
-[align="center",float="center",cols="<30%,<,<~"options="header"]
+[align="center",float="center",cols="<30%,<10%,<~"options="header"]
 |===
 | *Signal* | *Group* | *Function*
 |*itype*[_itype_width_p_-1:0] | MR | Termination type of the instruction
