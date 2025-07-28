@@ -297,6 +297,8 @@ NOTE: Symbol `link` means register *x1* or *x5* as specified in *The RISC-V Inst
 [[zcmt]]
 NOTE: Jump instructions (CM.JT and CM.JALT) defined by ratified *Zcmt* extension are handled as direct (inferable) jumps as jump tables are assumed to be static and known to the decoder.
 
+<<<
+
 [[tab:priv]]
 .Privilege level (*priv*) encoding
 [%autowidth,align="center",float="center",cols="<,<",options="header"]
