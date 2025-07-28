@@ -698,6 +698,8 @@ high and access is a store (*dtype* is 1) or atomic (*dtype* is 8 - 14).
 non-zero
 |===
 
+<<<
+
 [[tab:dtype]]
 .Data access type (*dtype*) encoding
 [%autowidth,align="center",float="center",cols="<,<",options="header"]
