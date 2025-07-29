@@ -3,8 +3,8 @@ Authors: Iain Robertson
 include::../docs-resources/global-config.adoc[]
 :docgroup: RISC-V Task Group
 :description: RISC-V Hart to Trace Interface Specification
-:revdate: 2/7/2025
-:revnumber: 0.1
+:revdate: 29/7/2025
+:revnumber: 0.7
 :revremark: This document is under development. Expect potential changes. Visit http://riscv.org/spec-state for further details.
 :revinfo:
 :preface-title: Preamble
@@ -41,7 +41,7 @@ endif::[]
 [preface]
 
 [WARNING]
-.This document is in the link:http://riscv.org/spec-state[Development state]
+.This document is in the link:http://riscv.org/spec-state[Stable state]
 ====
 Expect potential changes. This draft specification is likely to evolve before
 it is accepted as a standard. Implementations based on this draft

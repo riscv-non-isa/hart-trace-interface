@@ -158,7 +158,7 @@ BR group signals instead.
 
 [[tab:common-ingress]]
 .Instruction interface signals
-[%autowidth,align="center",float="center",cols="<,<,<"options="header"]
+[align="center",float="center",cols="<30%,<10%,<~"options="header"]
 |===
 | *Signal* | *Group* | *Function*
 |*itype*[_itype_width_p_-1:0] | MR | Termination type of the instruction
@@ -220,7 +220,7 @@ instruction in this block is 2^*ilastsize*^ half-words.
 
 [[tab:itype3]]
 .Instruction Type (*itype*) encoding (_itype_width_p_ = 3)
-[%autowidth,align="center",float="center",cols="<,<,<,~",options="header"]
+[align="center",float="center",cols="<7%,<17%,<13%,~",options="header"]
 |===
 | *Value* | *Name* | *Instruction* | *Condition/Notes*
 | 0 |Other | | Last instruction in the block matches none of the other instructions defined in this table
@@ -241,7 +241,7 @@ retired instruction
 
 [[tab:itype4]]
 .Instruction Type (*itype*) encoding (_itype_width_p_ = 4)
-[%autowidth,align="center",float="center",cols="<,<,<,<",options="header"]
+[align="center",float="center",cols="<7%,<22%,<13%,~",options="header"]
 |===
 | *Value* | *Name* | *Instruction* | *Condition/Notes*
 | 0 |Other | | Last instruction in the block matches none of the other instructions defined in this table
@@ -296,6 +296,8 @@ NOTE: Symbol `link` means register *x1* or *x5* as specified in *The RISC-V Inst
 
 [[zcmt]]
 NOTE: Jump instructions (CM.JT and CM.JALT) defined by ratified *Zcmt* extension are handled as direct (inferable) jumps as jump tables are assumed to be static and known to the decoder.
+
+<<<
 
 [[tab:priv]]
 .Privilege level (*priv*) encoding
@@ -695,6 +697,8 @@ high and access is a store (*dtype* is 1) or atomic (*dtype* is 8 - 14).
 |*ldata*[_ldata_width_p_-1:0] | S | Load data. Valid when *lresp* is
 non-zero
 |===
+
+<<<
 
 [[tab:dtype]]
 .Data access type (*dtype*) encoding
