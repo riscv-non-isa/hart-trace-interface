@@ -464,8 +464,7 @@ encoder to start tracing, and continue until further notice, subject to
 other filtering criteria also being met. A pulse on bit 1 will cause the
 encoder to stop tracing until further notice. See <<sec:trigger>>).
 |*halted* | O | Hart is halted. Upon assertion, the encoder will output a
-packet to report the address of the last instruction retired before
-halting, then indicate that tracing has stopped. Upon deassertion, the encoder will start tracing again,
+packet containing the information the decoder requires in order to determine the final instruction retired before halting (e.g. the address of that instruction, or the instruction count since the last reported instruction), then indicate that tracing has stopped. Upon deassertion, the encoder will start tracing again,
 commencing with a synchronization packet. *Note:* If this signal is not
 provided, it is strongly recommended that Debug mode can be signalled
 via a 3-bit *privilege* signal. This will allow tracing in Debug mode to
