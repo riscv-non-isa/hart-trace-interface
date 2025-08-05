@@ -1,0 +1,37 @@
+[[sec:extensions]]
+== Hart to Trace Encoder interface extensions
+
+This chapter specifies the following standard extensions to the base Hart to Trace Interface.
+
+[%autowidth,float="center",align="center",cols="^,^,^",options="header",]
+|===
+|       Specification                                        |Version |Status
+| <<sec:sdsec, *External Debug Security Extension*>>
+                                                             |*0.6.5*
+                                                                      |*Pre-ratified*
+
+|===
+[[sec:sdsec]]
+=== External Debug Security (sdsec) 
+
+The External Debug Security specification introduces the concept of the logical 'sec_inhibit' signal, which when active makes trace information unavailable to the trace encoder.  
+
+To accomplish this, the *halted* signal defined in <<tab:ingress-side-band, Optional sideband encoder input signals>> is replaced with the multi-bit *notrace* signal defined below:
+
+[[tab:ingress-side-band-sdsec]]
+.Optional sideband encoder input signals for inhibiting trace
+[%autowidth,align="center",float="center",cols="<,<,<",options="header"]
+|===
+| *Signal* | *Group* | *Function*
+|*notrace[1:0]* | O | 00: Tracing uninhibited +
+01: Trace is inhibited as the Hart is in debug mode. +
+10: Trace is inhibited for security reasons. +
+11: reserved
+|===
+
+When set to any non-zero value, the encoder will output a packet to report the address of the last instruction retired before inhibition, then indicate that tracing has stopped. Upon return to zero, the encoder may start tracing again (subject to any other filtering), commencing with a synchronization packet.
+
+==== Backwards compatibility considerations
+
+* A hart which supports *halted* can be connected to a Trace Encoder that supports *notrace* by wiring *halted* to *notrace[0]*, and tying *notrace[1]* to 0.
+* A hart which supports *notrace* can be connected to a Trace Encoder that supports *halted* by connecting the OR of both bits of the hart's *notrace* output to the encoder's *halted* input. 
