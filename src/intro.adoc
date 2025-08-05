@@ -1,7 +1,7 @@
 [[intro]]
 == Introduction
 
-The Hart to Trace Encoder Interface (HTI) was originally developed (and ratified) as part of the https://github.com/riscv-non-isa/riscv-trace-spec/releases/latest/[Efficient Trace for RISC-V (E-Trace) Specification].  However, the interface itself is not E-Trace specific, and is suitable for use with any instruction and data trace encoding protocol.  As such, it makes sense for it to be available as a standalone specification.
+The RISC-V Hart to Trace Encoder Interface (RHTI) was originally developed (and ratified) as part of the https://github.com/riscv-non-isa/riscv-trace-spec/releases/latest/[Efficient Trace for RISC-V (E-Trace) Specification].  However, the interface itself is not E-Trace specific, and is suitable for use with any instruction and data trace encoding protocol.  As such, this document makes it  available as a standalone specification.
 
 [[sec:terminology]]
 === Terminology
@@ -46,6 +46,7 @@ instruction being executed
 * *retire*: the final stage of executing an instruction, when the
 machine state is updated (sometimes referred to as ’commit’ or
 ’graduate’)
+* *RHTI* RISC-V Hart to Trace Encoder Interface (this specification)
 * *trap*: the transfer of control to a trap handler caused by either an
 exception or an interrupt
 * *updiscon*: contraction of ’uninferable PC discontinuity’
@@ -60,5 +61,3 @@ in the RISC-V ISA
 
 Items in _italics_ with names ending _’_p’_ refer to parameters either
 built into the hardware or configurable hardware values.
-
-

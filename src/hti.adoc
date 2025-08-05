@@ -1,5 +1,5 @@
 [[Interface]]
-== Hart to Trace Encoder interface
+== RISC-V Hart to Trace Encoder interface
 
 [[sec:InstructionInterfaceRequirements]]
 === Instruction Trace Interface requirements
@@ -57,22 +57,17 @@ target that _can_ be inferred from the source code.
 ** The first instruction retired following a context or time change.
 * Whether jump targets are sequentially inferable or not.
 
-The mandatory information is the bare-minimum required to implement the
-branch trace algorithm outlined in <<Algorithm>>.
+The mandatory information is the bare-minimum required to implement a basic
+branch trace encoding algorithm.
 The optional information facilitates alternative or improved trace
 algorithms:
 
-* Implicit return mode (see
-<<sec:implicit-return>>) requires the
-encoder to keep track of the number of nested function calls, and to do
-this it must be aware of all calls and returns regardless of whether the
-target can be inferred or not;
+* [[impret]]Implicit return mode does not usually generate trace packets for the return addresses of functions.  In order to do this the encoder needs to be aware of function calls and returns (see section 3.2.3 of the https://github.com/riscv-non-isa/riscv-trace-spec/releases/latest/[Efficient Trace for RISC-V Specification], or section 9.2 of the https://github.com/riscv-non-isa/tg-nexus-trace/releases/latest/[RISC-V N-Trace Specification]);
 * A simpler algorithm useful for basic code profiling would only report
 function calls and returns, again regardless of whether the target can
 be inferred or not;
 * Branch prediction techniques can be used to further improve the
-encoder efficiency, particularly for loops (see
-<<sec:branch-prediction>>). This requires
+encoder efficiency, particularly for loops. This requires
 the encoder to be aware of the address of all branches, whether they are
 taken or not.
 * Uninferable jumps can be treated as inferable (which don't need to be
@@ -109,33 +104,8 @@ encoder, and should have a minimal impact on trace efficiency as it is
 anticipated that consecutive execution will be the norm. Support for
 sequentially inferable jumps is optional.
 
-Jumps may optionally be further classified according to the recommended
-calling convention:
+Jumps may optionally be further classified according to the recommended calling convention into _Calls_, _Returns_, _Co-routine swap_, and _other jumps with and without linkage_.  Full details are provided in <<tab:itype4>>.
 
-* _Calls_:
-** *_jal_* x1;
-** *_jal_* x5;
-** *_jalr_* x1, rs where rs != x5;
-** *_jalr_* x5, rs where rs != x1;
-** *_c.jalr_* rs1 where rs1 != x5;
-** *_c.jal_*.
-* _Other jumps without linkage_:
-** *_jal_* x0;
-** *_c.j_*;
-** *_jalr_* x0, rs where rs != x1 and rs != x5;
-** *_c.jr_* rs1 where rs1 != x1 and rs1 != x5.
-* _Returns_:
-** *_jalr_* rd, rs where (rs == x1 or rs == x5) and rd != x1 and rd !=
-x5;
-** *_c.jr_* rs1 where rs1 == x1 or rs1 == x5.
-* _Co-routine swap_:
-** *_jalr_* x1, x5;
-** *_jalr_* x5, x1;
-** *_c.jalr_* x5.
-* _Other jumps with linkage_:
-** *_jal_* rd where rd != x0 and rd != x1 and rd != x5;
-** *_jalr_* rd, rs where rs != x1 and rs != x5 and rd != x0 and rd != x1
-and rd != x5.
 
 [[sec:relationship]]
 ==== Relationship between RISC-V core and the encoder
@@ -164,7 +134,7 @@ so this configuration is not recommended.)
 === Instruction Trace Interface
 
 This section describes the interface between a RISC-V hart and the trace
-encoder that conveys the information described in the section
+encoder that conveys the information described in
 <<sec:InstructionInterfaceRequirements>>. Signals are assigned to one
 of the following groups:
 
@@ -188,11 +158,11 @@ BR group signals instead.
 
 [[tab:common-ingress]]
 .Instruction interface signals
-[%autowidth,align="center",float="center",cols="<,<,<"options="header"]
+[align="center",float="center",cols="<30%,<10%,<~"options="header"]
 |===
 | *Signal* | *Group* | *Function*
 |*itype*[_itype_width_p_-1:0] | MR | Termination type of the instruction
-block. Encoding given in <<tab:itype>> (see <<JumpClasses>> for definitions of codes 6 - 15).
+block. Encoding given in <<tab:itype3>> and <<tab:itype4>>.
 |*cause*[_ecause_width_p_-1:0] | M | Exception or interrupt cause
 (*_scause/ vscause/mcause_*). Ignored unless **itype**=1 or 2.
 |*tval*[_iaddress_width_p_-1:0] | M | The associated trap value, e.g. the
@@ -248,31 +218,86 @@ instruction is 2^*ilastsize*^ half-words.
 instruction in this block is 2^*ilastsize*^ half-words.
 |===
 
-[[tab:itype]]
-.Instruction Type (*itype*) encoding
-[%autowidth,align="center",float="center",cols="<,<",options="header"]
+[[tab:itype3]]
+.Instruction Type (*itype*) encoding (_itype_width_p_ = 3)
+[align="center",float="center",cols="<7%,<17%,<13%,~",options="header"]
 |===
-| *Value* | *Description*
-| 0 |Last instruction in the block is none of the other named *itype*
-codes
-|1 | Exception. An exception that traps occurred following the last
-retired instruction in the block
-|2 | Interrupt. An interrupt that traps occurred following the last
-retired instruction in the block
-|3 | Exception or interrupt return
-|4 | Nontaken branch
-|5 | Taken branch
-|6 | Uninferable jump if _itype_width_p_ is 3, reserved otherwise
-|7 | reserved
-|8 | Uninferable call
-|9 | Inferrable call
-|10 | Uninferable jump
-|11 | Inferrable jump
-|12 | Co-routine swap
-|13 | Return
-|14 | Other uninferable jump
-|15 | Other inferable jump
+| *Value* | *Name* | *Instruction* | *Condition/Notes*
+| 0 |Other | | Last instruction in the block matches none of the other instructions defined in this table
+|1 | Exception | | An exception that traps occurred following the last instruction. +
+   Note: ECALL, EBREAK or C.EBREAK instructions raise exceptions but do not retire
+|2 | Interrupt | | An interrupt that traps occurred following the last
+retired instruction
+|3 | Trap return | MRET +
+                   SRET | Return from exception or interrupt handler
+|4 | Nontaken branch | <<itype_branch,Conditional branch>> | Not-taken direct, conditional branch
+|5 | Taken branch |  <<itype_branch,Conditional branch>> | Taken direct, conditional branch
+|6 | Uninferrable jump +
+     Pop/Return | JALR rd, rs +
+                  CM.POPRET| Uninferable jump +
+                  Defined by *Zcmt* extension
+|7 | reserved | |
 |===
+
+[[tab:itype4]]
+.Instruction Type (*itype*) encoding (_itype_width_p_ = 4)
+[align="center",float="center",cols="<7%,<22%,<13%,~",options="header"]
+|===
+| *Value* | *Name* | *Instruction* | *Condition/Notes*
+| 0 |Other | | Last instruction in the block matches none of the other instructions defined in this table
+|1 | Exception | | An exception that traps occurred following the last instruction. +
+   Note: ECALL, EBREAK or C.EBREAK instructions raise exceptions but do not retire
+|2 | Interrupt | | An interrupt that traps occurred following the last
+retired instruction
+|3 | Trap return | MRET +
+                   SRET | Return from exception or interrupt handler
+|4 | Nontaken branch | <<itype_branch,Conditional branch>> | Not-taken direct, conditional branch
+|5 | Taken branch |  <<itype_branch,Conditional branch>> | Taken direct, conditional branch
+| 6 +
+ 7 | reserved | |
+|8 | Uninferable call | JALR rd, rs +
+                                    +
+                        C.JALR rs | rd = `link` and rs != `link` +
+                                    rd = `link` and rs = `link` and rd = rs +
+                                    rs != *x5*
+|9 | Inferrable call | JAL rd +
+                       C.JAL +
+                       CM.JALT| rd = `link` +
+                                Expands to `JAL x1, offset` +
+                                Defined by <<zcmt,Zcmt>> extension
+|10 | Uninferable jump +
+      (without linkage) | JALR rd, rs +
+                          C.JR rs    | rd = *x0* and rs != `link` +
+                                       rs != `link` +
+|11 | Inferrable jump | JAL rd +
+                        C.J +
+                        CM.JT| rd = *x0* +
+                               Expands to `JAL x0, offset` +
+                               Defined by <<zcmt,Zcmt>> extension
+|12 | Co-routine swap | JALR rd, rs +
+                        C.JALR rs| rd = `link` and rs = `link` and rd != rs +
+                                   rs = *x5* +
+|13 | Return +
+      Pop/return | JALR rd, rs +
+                   C.JR rs +
+                   CM.POPRET| rd != `link` and rs = `link` +
+                              rs = `link` +
+                              Defined by *Zcmt* extension
+|14 | Other uninferable jump (with linkage) | JALR rd, rs | rd != `link` and rd != *x0* and rs != `link` +
+|15 | Other inferable jump (without linkage) | JAL rd | rd != `link` and rd != *x0*
+|===
+
+
+[[itype_branch]]
+NOTE: Branches (*itype*=4, 5) are always conditional, direct branches. In RISC-V ISA all jumps, calls, returns are always unconditional.
+
+[[link]]
+NOTE: Symbol `link` means register *x1* or *x5* as specified in *The RISC-V Instruction Set Manual, Volume I: Unprivileged ISA* document.
+
+[[zcmt]]
+NOTE: Jump instructions (CM.JT and CM.JALT) defined by ratified *Zcmt* extension are handled as direct (inferable) jumps as jump tables are assumed to be static and known to the decoder.
+
+<<<
 
 [[tab:priv]]
 .Privilege level (*priv*) encoding
@@ -306,9 +331,9 @@ block.
 *itype* can be 3 or 4 bits wide. If _itype_width_p_ is 3, a single code
 (6) is used to indicate all uninferable jumps. This is simpler to
 implement, but precludes use of the implicit return mode (see
-<<sec:implicit-return>>), which requires jump types to be fully classified.  
-Note that when _itype_width_p_ is 3, *itype* = 0 is used for inferrable calls.  
-However, inferrable calls must still be the last instruction retired in a 
+<<impret,Implicit Return>>), which requires jump types to be fully classified.
+Note that when _itype_width_p_ is 3, *itype* = 0 is used for inferrable calls.
+However, inferrable calls must still be the last instruction retired in a
 block, otherwise the block would not be comprised of contiguous instructions.
 
 Whilst *iaddr* is typically a virtual address, it does not affect the
@@ -394,7 +419,7 @@ summarized as follows:
 
 *Note:* *ilastsize* is still needed in order to determine the address of
 the next instruction, as this is the predicted return address for
-implicit return mode (see section 3.2.3 of the https://github.com/riscv-non-isa/riscv-trace-spec/releases/latest/[Efficient Trace for RISC-V Specification], or section 9.2 of the https://github.com/riscv-non-isa/tg-nexus-trace/releases/latest/[RISC-V N-Trace Specification]).
+<<impret, Implicit Return mode>>.
 
 The parameter _retires_p_ which indicates to the encoder the maximum
 number of instructions that can be retired per cycle can be used by an
@@ -419,7 +444,7 @@ and OR.
 ==== Optional sideband signals
 
 Optional sideband signals may be included to provide additional
-functionality, as described in 
+functionality, as described in
 <<tab:ingress-side-band>> and
 <<tab:egress-side-band>>.
 
@@ -439,8 +464,7 @@ encoder to start tracing, and continue until further notice, subject to
 other filtering criteria also being met. A pulse on bit 1 will cause the
 encoder to stop tracing until further notice. See <<sec:trigger>>).
 |*halted* | O | Hart is halted. Upon assertion, the encoder will output a
-packet to report the address of the last instruction retired before
-halting, then indicate that tracing has stopped. Upon deassertion, the encoder will start tracing again,
+packet containing the information the decoder requires in order to determine the final instruction retired before halting (e.g. the address of that instruction, or the instruction count since the last reported instruction), then indicate that tracing has stopped. Upon deassertion, the encoder will start tracing again,
 commencing with a synchronization packet. *Note:* If this signal is not
 provided, it is strongly recommended that Debug mode can be signalled
 via a 3-bit *privilege* signal. This will allow tracing in Debug mode to
@@ -496,7 +520,7 @@ cycle that Trace-off is asserted (subject to any optional filtering).
 It follows from this that:
 
 *  if tracing is enabled and trace-off occurs on the cycle before trace-on, then tracing will continue unimpeded (i.e. it stays on);
-* if tracing is disabled and trace-on and trace-off triggers occur simultaneously then only the instructions retired in that cycle will be traced. 
+* if tracing is disabled and trace-on and trace-off triggers occur simultaneously then only the instructions retired in that cycle will be traced.
 
 Trace-notify provides means to ensure that a specified instruction is
 explicitly reported (subject to any optional filtering). This capability
@@ -518,7 +542,7 @@ is sometimes known as a watchpoint.
 | **iretire**=3, **iaddr**=0x0940, **itype**=4
 |0946: *_c.bnez_* | **iretire**=1, **iaddr**=0x0946, **itype**=5
 |0988: *_lbu_* +
-098C: *_csrrw_* 
+098C: *_csrrw_*
 | **iretire**=4, **iaddr**=0x0988, **itype**=0
 |===
 
@@ -672,6 +696,8 @@ high and access is a store (*dtype* is 1) or atomic (*dtype* is 8 - 14).
 |*ldata*[_ldata_width_p_-1:0] | S | Load data. Valid when *lresp* is
 non-zero
 |===
+
+<<<
 
 [[tab:dtype]]
 .Data access type (*dtype*) encoding
