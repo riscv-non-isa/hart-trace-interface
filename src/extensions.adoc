@@ -6,29 +6,29 @@ This chapter specifies the following standard extensions to the base Hart to Tra
 [%autowidth,float="center",align="center",cols="^,^,^",options="header",]
 |===
 |       Specification                                        |Version |Status
-| <<sec:notrace, *Trace Inhibit or Pause*>>|*0.1* |*Proposed fast-track*
+| <<sec:notrace, *Trace State*>>|*0.1* |*Proposed fast-track*
 
 
 |===
 [[sec:notrace]]
-=== Trace Inhibit or Pause
+=== Trace State
 The *halted* signal defined in <<tab:ingress-side-band, Optional sideband encoder input signals>> provides a mechanism to inhibit tracing whilst the hart is in Debug mode.  However, since this was defined, other conditions that require similar behaviour have been identified:
 
 * Inhibiting trace for security reasons;
 
 * Pausing trace due to a Wait for Interrupt (WFI) instruction.
 
-To accomplish this, the *halted* signal is replaced with the multi-bit *notrace* signal defined below:
+To accomplish this, the *halted* signal is replaced with the multi-bit *trcstate* signal defined below:
 
 [[tab:ingress-side-band-sdsec]]
-.Optional sideband encoder input signals for inhibiting trace
+.Optional sideband encoder input signal for trace state
 [%autowidth,align="center",float="center",cols="<,<,<",options="header"]
 |===
 | *Signal* | *Group* | *Function*
-|*notrace[1:0]* | O | 00: Tracing uninhibited +
-01: Trace is inhibited as the Hart is in debug mode. +
-10: Trace is inhibited for security reasons. +
-11: Trace is paused due to WFI.
+|*trcstate[1:0]* | O | 00: Tracing uninhibited by the hart +
+01: Inhibit trace as the hart is in debug mode. +
+10: Inhibit trace for security reasons. +
+11: Pause trace due to WFI.
 |===
 
 When set to any non-zero value, the encoder will output a packet containing the information the decoder requires in order to determine the final instruction retired up to this point (e.g. the address of that instruction, or the instruction count since the last reported instruction).  If trace is inhibited (but not paused), the encoder will then also indicate that tracing has stopped.
@@ -40,21 +40,20 @@ If there are simultaneously multiple different reasons for the hart to drive a n
 [[sec:sdsec]]
 ==== External Debug Security (sdsec)
 
-The External Debug Security specification introduces the concept of the logical 'sec_inhibit' signal, which when active requires trace to be inhibited.  This can be achieved by setting *notrace* to 01 when 'sec_inhibit' is true.
+The External Debug Security specification introduces the concept of the logical 'sec_inhibit' signal, which when active requires trace to be inhibited.  This can be achieved by setting *trcstate* to 01 when 'sec_inhibit' is true.
 
 [[sec:wfi]]
 ==== Wait for Interrupt
 
 The Wait for Interrupt (WFI) instruction can result in a long pause in activity, and in some cases (possibly as the result of a software bug), the pause may be indefinite.
 
-Providing a mechanism for the trace encoder to indicate that WFI has been entered allows the user to be informed that a WFI state has been entered, and if timestamps are enabled gives an indication of the time of entry.  Combined with a timestamped sync packet following exit from WFI, this allows the user to determine how long the hart spent in the WFI state.
+Providing a mechanism for the trace encoder to indicate that WFI has been entered allows the user to be informed of this, and if timestamps are enabled gives an indication of the time of entry.  Combined with a timestamped sync packet following exit from WFI, this allows the user to determine how long the hart spent in the WFI state.
 
 Without this mechanism, WFI has no direct impact on the trace stream (it is treated as an ordinary instruction with *itype* = 0 when it retires).  If an indefinite WFI occurs, the trace message stream simply stops without any indication as to why.
 
-WFI may also disable the hart clock, and by extension the clock used by the trace encoder.  For encoders that utilize partial timestamps, any accrued branch history must be reported within a maximum time from the last packet in order to maintain timestamp integrity, and this cannot be done if the clock is stopped.  Outputting any such history prior to disabling the clock (i.e. when *notrace* becomes 11) avoids this potential issue.
-
+WFI may also disable the hart clock, and by extension the clock used by the trace encoder.  For encoders that utilize partial timestamps, any accrued branch history must be reported within a maximum time from the last packet in order to maintain timestamp integrity, and this cannot be done if the clock is stopped.  Outputting any such history when *trcstate* becomes 11 prior to disabling the clock avoids this potential issue.
 
 ==== Backwards compatibility considerations
 
-* A hart which supports *halted* can be connected to a Trace Encoder that supports *notrace* by wiring *halted* to *notrace[0]*, and tying *notrace[1]* to 0.
-* A hart which supports *notrace* can be connected to a Trace Encoder that supports *halted* by connecting the OR of both bits of the hart's *notrace* output to the encoder's *halted* input.
+* A hart which supports *halted* can be connected to a Trace Encoder that supports *trcstate* by wiring *halted* to *trcstate[0]*, and tying *trcstate[1]* to 0.
+* A hart which supports *trcstate* can be connected to a Trace Encoder that supports *halted* by connecting the OR of both bits of the hart's *trcstate* output to the encoder's *halted* input.
