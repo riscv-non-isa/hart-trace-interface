@@ -6,11 +6,11 @@ This chapter specifies the following standard extensions to the base Hart to Tra
 [%autowidth,float="center",align="center",cols="^,^,^",options="header",]
 |===
 |       Specification                                        |Version |Status
-| <<sec:notrace, *Trace State*>>|*0.1* |*Proposed fast-track*
+| <<sec:trcstate, *Trace State*>>|*0.1* |*Proposed fast-track*
 
 
 |===
-[[sec:notrace]]
+[[sec:trcstate]]
 === Trace State
 The *halted* signal defined in <<tab:ingress-side-band, Optional sideband encoder input signals>> provides a mechanism to inhibit tracing whilst the hart is in Debug mode.  However, since this was defined, other conditions that require similar behaviour have been identified:
 
@@ -36,6 +36,10 @@ When set to any non-zero value, the encoder will output a packet containing the 
 Upon return to zero, the encoder may start tracing again (subject to any other filtering), commencing with a synchronization packet.
 
 If there are simultaneously multiple different reasons for the hart to drive a non-zero value, it should prioritize the lowest numerical value.
+
+*Note:* If neither *halted* nor *trcstate* are provided, it is strongly recommended that Debug mode can be signalled
+via a 3-bit *privilege* signal. This will allow tracing in Debug mode to
+be controlled via the optional filtering capabilities.
 
 [[sec:sdsec]]
 ==== External Debug Security (sdsec)
