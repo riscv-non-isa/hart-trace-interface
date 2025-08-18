@@ -389,7 +389,7 @@ imprecisely.
 
 [[tab:context-type]]
 .Context type *ctype* values and corresponding actions
-[%autowidth,align="center",float="center",cols="<,<,<",options="header"]
+[align="center",float="center",cols="<20%,<8%,~",options="header"]
 |===
 | *Type* | *Value* | *Actions*
 | Unreported | 0 | No action (don't report context).
@@ -455,7 +455,7 @@ encoder will need to be applied via the *context* input.
 
 [[tab:ingress-side-band]]
 .Optional sideband encoder input signals
-[align="center",float="center",cols="<30%,<9%,~",options="header"]
+[align="center",float="center",cols="<25%,<9%,~",options="header"]
 |===
 | *Signal* | *Group* | *Function*
 |*impdef*[_impdef_width_p_-1:0] | O | Implementation defined sideband
