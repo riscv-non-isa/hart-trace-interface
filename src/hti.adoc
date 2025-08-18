@@ -669,7 +669,7 @@ first. For example, if there is one data access, use only group 0.
 
 [[tab:data-ingress]]
 .Data interface signals
-[align="center",float="center",cols="<30%,<10%,<~",options="header"]
+[align="center",float="center",cols="<32%,<8%,<~",options="header"]
 |===
 | *Signal* | *Group* | *Function*
 |*dretire* | M | Data access retired (when high)
