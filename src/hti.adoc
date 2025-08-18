@@ -389,7 +389,7 @@ imprecisely.
 
 [[tab:context-type]]
 .Context type *ctype* values and corresponding actions
-[%autowidth,align="center",float="center",cols="<,<,<",options="header"]
+[align="center",float="center",cols="<18%,<7%,~",options="header"]
 |===
 | *Type* | *Value* | *Actions*
 | Unreported | 0 | No action (don't report context).
@@ -398,11 +398,13 @@ operating system process change. Report the new context value at the
 earliest convenient opportunity. It is reported without any address
 information, and the assumption is that the precise point of context
 change can be deduced from the source code (e.g. a CSR write).
-| Report context precisely | 2 | Report the address of the 1st instruction
+| Report context +
+  precisely | 2 | Report the address of the 1st instruction
 retired in this block, and the new context. If there were unreported
 branches beforehand, these need to be reported first. Treated the same
 as a privilege change.
-| Report context as an asynchronous discontinuity | 3 | An example would be a change of hart. Need to report the last instruction
+| Report context as +
+  an asynchronous discontinuity | 3 | An example would be a change of hart. Need to report the last instruction
 retired on the previous context, as well as the 1st on the new context.
 Treated the same as an exception.
 |===
@@ -453,7 +455,7 @@ encoder will need to be applied via the *context* input.
 
 [[tab:ingress-side-band]]
 .Optional sideband encoder input signals
-[%autowidth,align="center",float="center",cols="<,<,<",options="header"]
+[align="center",float="center",cols="<26%,<9%,~",options="header"]
 |===
 | *Signal* | *Group* | *Function*
 |*impdef*[_impdef_width_p_-1:0] | O | Implementation defined sideband
@@ -667,7 +669,7 @@ first. For example, if there is one data access, use only group 0.
 
 [[tab:data-ingress]]
 .Data interface signals
-[%autowidth,align="center",float="center",cols="<,<,<",options="header"]
+[align="center",float="center",cols="<32%,<8%,<~",options="header"]
 |===
 | *Signal* | *Group* | *Function*
 |*dretire* | M | Data access retired (when high)
