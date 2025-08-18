@@ -398,7 +398,8 @@ operating system process change. Report the new context value at the
 earliest convenient opportunity. It is reported without any address
 information, and the assumption is that the precise point of context
 change can be deduced from the source code (e.g. a CSR write).
-| Report context precisely | 2 | Report the address of the 1st instruction
+| Report context +
+  precisely | 2 | Report the address of the 1st instruction
 retired in this block, and the new context. If there were unreported
 branches beforehand, these need to be reported first. Treated the same
 as a privilege change.
@@ -454,7 +455,7 @@ encoder will need to be applied via the *context* input.
 
 [[tab:ingress-side-band]]
 .Optional sideband encoder input signals
-[align="center",float="center",cols="<20%,<10%,~",options="header"]
+[align="center",float="center",cols="<30%,<9%,~",options="header"]
 |===
 | *Signal* | *Group* | *Function*
 |*impdef*[_impdef_width_p_-1:0] | O | Implementation defined sideband
