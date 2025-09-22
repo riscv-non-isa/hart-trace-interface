@@ -22,14 +22,14 @@ immediately following the exception);
 * The current privilege level of the RISC-V hart;
 * The _instruction_type_ of retired instructions for:
 ** Jumps with a target that cannot be inferred from the source code;
-** Taken and nontaken branches;
+** Taken and non-taken branches;
 ** Return from exception or interrupt (*_*ret_* instructions).
 * The _instruction_address_ for:
 ** Jumps with a target that _cannot_ be inferred from the source code;
 ** The instruction retired immediately after a jump with a target that
 _cannot_ be inferred from the source code (also referred to as the
 target or destination of the jump);
-** Taken and nontaken branches;
+** Taken and non-taken branches;
 ** The last instruction retired before an exception or interrupt;
 ** The first instruction retired following an exception or interrupt;
 ** The last instruction retired before a privilege change;
@@ -220,7 +220,7 @@ instruction in this block is 2^*ilastsize*^ half-words.
 
 [[tab:itype3]]
 .Instruction Type (*itype*) encoding (_itype_width_p_ = 3)
-[align="center",float="center",cols="<7%,<17%,<13%,~",options="header"]
+[align="center",float="center",cols="<7%,<22%,<13%,~",options="header"]
 |===
 | *Value* | *Name* | *Instruction* | *Condition/Notes*
 | 0 |Other | | Last instruction in the block matches none of the other instructions defined in this table
@@ -230,12 +230,16 @@ instruction in this block is 2^*ilastsize*^ half-words.
 retired instruction
 |3 | Trap return | MRET +
                    SRET | Return from exception or interrupt handler
-|4 | Nontaken branch | <<itype_branch,Conditional branch>> | Not-taken direct, conditional branch
+|4 | Non-taken branch | <<itype_branch,Conditional branch>> | Not-taken direct, conditional branch
 |5 | Taken branch |  <<itype_branch,Conditional branch>> | Taken direct, conditional branch
 |6 | Uninferrable jump +
-     Pop/Return | JALR rd, rs +
-                  CM.POPRET| Uninferrable jump +
-                  Defined by *Zcmt* extension
+     Return | JALR rd, rs +
+              C.JALR rs +
+              C.JR rs +
+              CM.POPRET| Uninferrable jump +
+              +
+              +
+              Defined by *Zcmt* extension
 |7 | reserved | |
 |===
 
@@ -251,10 +255,10 @@ retired instruction
 retired instruction
 |3 | Trap return | MRET +
                    SRET | Return from exception or interrupt handler
-|4 | Nontaken branch | <<itype_branch,Conditional branch>> | Not-taken direct, conditional branch
+|4 | Non-taken branch | <<itype_branch,Conditional branch>> | Not-taken direct, conditional branch
 |5 | Taken branch |  <<itype_branch,Conditional branch>> | Taken direct, conditional branch
-| 6 +
- 7 | reserved | |
+| 6 | reserved | |
+| 7 | reserved | |
 |8 | Uninferrable call | JALR rd, rs +
                                     +
                         C.JALR rs | rd = `link` and rs != `link` +
@@ -277,12 +281,11 @@ retired instruction
 |12 | Co-routine swap | JALR rd, rs +
                         C.JALR rs| rd = `link` and rs = `link` and rd != rs +
                                    rs = *x5* +
-|13 | Return +
-      Pop/return | JALR rd, rs +
-                   C.JR rs +
-                   CM.POPRET| rd != `link` and rs = `link` +
-                              rs = `link` +
-                              Defined by *Zcmt* extension
+|13 | Return | JALR rd, rs +
+               C.JR rs +
+               CM.POPRET| rd != `link` and rs = `link` +
+                          rs = `link` +
+                          Defined by *Zcmt* extension
 |14 | Other uninferrable jump (with linkage) | JALR rd, rs | rd != `link` and rd != *x0* and rs != `link` +
 |15 | Other inferrable jump (without linkage) | JAL rd | rd != `link` and rd != *x0*
 |===
