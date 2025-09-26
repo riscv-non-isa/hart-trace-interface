@@ -665,8 +665,7 @@ non-zero
 |===
 
 The maximum value of _dtype_width_p_ is 4. However, if only loads and
-stores are supported, _dtype_width_p_ can be 1. If Multi-memory access instrctions are also required, _dtype_width_p_ can be 2.  If CSRs are upported
-but atomics are not, _dtype_width_p_ can be 3.
+stores are supported, _dtype_width_p_ can be 1. If Multi-memory access instructions are also required, _dtype_width_p_ can be 2.  If CSRs are supported but atomics are not, _dtype_width_p_ can be 3.
 
 Atomic and CSR accesses have either both load and store data, or store
 data and an operand. For CSRs and unified atomics, both values are
