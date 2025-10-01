@@ -685,7 +685,7 @@ instruction address. Required if _retires_p_ > 1
 access instruction is retired. Required if there are replicated
 instruction block signals
 |*lrid*[_lrid_width_p_-1:0] | S | Load request ID. Valid when *dretire*
-is high
+is high.  Ignored unless *dtype* indicates a store.
 |*lresp*[_lresp_width_p_-1:0] | S | Load response: +
 0: None +
 1: reserved +
