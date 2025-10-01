@@ -728,7 +728,7 @@ The maximum value of _dtype_width_p_ is 4. However, if only loads and
 stores are supported, _dtype_width_p_ can be 1. If CSRs are supported
 but atomics are not, _dtype_width_p_ can be 3.
 
-Atomic and CSR accesses have load data and an operand (the actual stored data is obtained by applying the operator indicated by *dtype* to these values). For CSRs and unified atomics, both values are reported via *data*, with the operand data in the LSBs and the load data in the MSBs.  For split atomics, the operand is reported via *sdata*.
+Atomic and CSR accesses have load data and an operand (the actual stored data is obtained by applying the operator indicated by *dtype* to these values). For CSRs and unified atomics, both values are reported via *data*, with the operand data in the LSBs and the load data in the MSBs.  For split atomics, the operand is reported via *sdata* and the load data via *ldata*.
 
 _lrid_width_p_ is determined by the maximum number of loads that can be
 in progress simultaneously, such that at any one time there can be no
