@@ -383,7 +383,7 @@ dynamically.
 <<tab:context-type>> specifies the actions for
 the various *ctype* values. A typical behavior would be for this signal
 to remain zero except on the 1st retirement after a context change or
-when a time value should be reported. _ctype_width_p_ may be 1 or 2. The
+when a time value should be reported. Note also that *context* and *time* are automatically included in trace packets reporting the 1st instruction of a trap handler, or after a privilege change, and so this signal can remain zero in these cases as well (though it is not required).  _ctype_width_p_ may be 1 or 2. The
 reduced width option only provides support for reporting context changes
 imprecisely.
 
