@@ -564,7 +564,7 @@ and CSR. Support for both atomic and CSR accesses are independently
 optional.
 
 The signalling protocol can take one of two forms, depending on the
-needs of the RISC-V hart: _unified_ or _split_.
+needs of the RISC-V hart: _unified_ or _split_.  A hart is expected to provide one of these forms, not both simultaneously.
 
 Unified is the simplest form, suitable for simpler, in-order harts. In
 this form, all information about a data access is signalled by the
@@ -575,15 +575,17 @@ For harts with out of order or speculative execution capabilities, many
 loads may be in progress simultaneously, and this approach is not
 practical as it would require the hart to maintain a large amount of
 state relating to all the in-progress loads. For this reason, the
-interface also supports splitting loads into two parts:
+interface also supports splitting loads, atomic and CSR accesses into two parts:
 
-* The _request_ phase provides all the information about the load that
+* The _request_ phase provides all the information about the access that
 originates from the hart (address, size, etc.) when the instruction
 retires;
-* The _response_ phase provides the data and response status when it has
+* The _response_ phase provides the load data and response status when it has
 been returned to the hart from the memory system.
 
 The two parts of a split load are associated by use of a transaction ID.
+
+For CSR accesses, the _request_ and _response_ phases should occur simultaneously.
 
 The Zc (code-size reduction) extension introduced push and pop
 instructions (_cm.push_, _cm.pop_, _cm.popret_ and _cm.popretz_) that
@@ -728,7 +730,7 @@ The maximum value of _dtype_width_p_ is 4. However, if only loads and
 stores are supported, _dtype_width_p_ can be 1. If CSRs are supported
 but atomics are not, _dtype_width_p_ can be 3.
 
-Atomic and CSR accesses have load data and an operand (the actual stored data is obtained by applying the operator indicated by *dtype* to these values). For CSRs and unified atomics, both values are reported via *data*, with the operand data in the LSBs and the load data in the MSBs.  For split atomics, the operand is reported via *sdata* and the load data via *ldata*.
+Atomic and CSR accesses have load data and an operand (the actual stored data is obtained by applying the operator indicated by *dtype* to these values). When using unified signalling, both values are reported via *data*, with the operand data in the LSBs (occupying bits 0 through _data_width_p_/2 - 1) and the load data in the MSBs (occupying bits _data_width_p_/2 through _data_width_p_ - 1).  When using split signalling, the operand is reported via *sdata* and the load data via *ldata*.
 
 _lrid_width_p_ is determined by the maximum number of loads that can be
 in progress simultaneously, such that at any one time there can be no
