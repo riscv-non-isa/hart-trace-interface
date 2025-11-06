@@ -13,23 +13,22 @@ The following information is mandatory:
 
 * The number of instructions that are being retired;
 * Whether there has been an exception or interrupt, and if so the cause
-(from the *_scause/vscause/mcause_* etc. CSR) and trap value (from the
-*_stval/vstval/mtval_* etc. CSR).
+(from the `scause`/`vscause`/`mcause` etc. CSR) and trap value (from the `stval`/`vstval`/`mtval` etc. CSR).
 +
 The register set to output should be the set that is updated as a result
 of the exception (i.e. the set associated with the privilege level
 immediately following the exception);
 * The current privilege level of the RISC-V hart;
-* The _instruction_type_ of retired instructions for:
+* The instruction type of retired instructions for:
 ** Jumps with a target that cannot be inferred from the source code;
-** Taken and nontaken branches;
+** Taken and non-taken branches;
 ** Return from exception or interrupt (*_*ret_* instructions).
-* The _instruction_address_ for:
+* The instruction address for:
 ** Jumps with a target that _cannot_ be inferred from the source code;
 ** The instruction retired immediately after a jump with a target that
 _cannot_ be inferred from the source code (also referred to as the
 target or destination of the jump);
-** Taken and nontaken branches;
+** Taken and non-taken branches;
 ** The last instruction retired before an exception or interrupt;
 ** The first instruction retired following an exception or interrupt;
 ** The last instruction retired before a privilege change;
@@ -77,7 +76,7 @@ instruction which loads the target into a register have been traced.
 [[JumpClasses]]
 ==== Jump classification and target inference
 
-Jumps are classified as _inferrable_, or _uninferrable_. An _inferrable_
+Jumps are classified as _inferrable_ or _uninferrable_. An _inferrable_
 jump has a target which can be deduced from the binary executable or
 representation thereof (e.g. ELF). For the purposes of this
 specification, the following strict definition applies:
@@ -164,10 +163,10 @@ BR group signals instead.
 |*itype*[_itype_width_p_-1:0] | MR | Termination type of the instruction
 block. Encoding given in <<tab:itype3>> and <<tab:itype4>>.
 |*cause*[_ecause_width_p_-1:0] | M | Exception or interrupt cause
-(*_scause/ vscause/mcause_*). Ignored unless **itype**=1 or 2.
+(`scause`/ `vscause`/`mcause`). Ignored unless **itype**=1 or 2.
 |*tval*[_iaddress_width_p_-1:0] | M | The associated trap value, e.g. the
 faulting virtual address for address exceptions, as would be written to
-the *stval/vstval/mtval* CSR. Future optional extensions may
+the `stval`/`vstval`/`mtval` CSR. Future optional extensions may
 define *tval* to provide ancillary information in cases where it
 currently supplies zero. Ignored unless **itype**=1.
 |*priv*[_privilege_width_p_-1:0] | M | Privilege level for all
@@ -220,7 +219,7 @@ instruction in this block is 2^*ilastsize*^ half-words.
 
 [[tab:itype3]]
 .Instruction Type (*itype*) encoding (_itype_width_p_ = 3)
-[align="center",float="center",cols="<7%,<17%,<13%,~",options="header"]
+[align="center",float="center",cols="<7%,<22%,<13%,~",options="header"]
 |===
 | *Value* | *Name* | *Instruction* | *Condition/Notes*
 | 0 |Other | | Last instruction in the block matches none of the other instructions defined in this table
@@ -230,12 +229,16 @@ instruction in this block is 2^*ilastsize*^ half-words.
 retired instruction
 |3 | Trap return | MRET +
                    SRET | Return from exception or interrupt handler
-|4 | Nontaken branch | <<itype_branch,Conditional branch>> | Not-taken direct, conditional branch
+|4 | Non-taken branch | <<itype_branch,Conditional branch>> | Not-taken direct, conditional branch
 |5 | Taken branch |  <<itype_branch,Conditional branch>> | Taken direct, conditional branch
 |6 | Uninferrable jump +
-     Pop/Return | JALR rd, rs +
-                  CM.POPRET| Uninferrable jump +
-                  Defined by *Zcmt* extension
+     Return | JALR rd, rs +
+              C.JALR rs +
+              C.JR rs +
+              CM.POPRET| Uninferrable jump +
+              +
+              +
+              Defined by *Zcmt* extension
 |7 | reserved | |
 |===
 
@@ -251,10 +254,10 @@ retired instruction
 retired instruction
 |3 | Trap return | MRET +
                    SRET | Return from exception or interrupt handler
-|4 | Nontaken branch | <<itype_branch,Conditional branch>> | Not-taken direct, conditional branch
+|4 | Non-taken branch | <<itype_branch,Conditional branch>> | Not-taken direct, conditional branch
 |5 | Taken branch |  <<itype_branch,Conditional branch>> | Taken direct, conditional branch
-| 6 +
- 7 | reserved | |
+| 6 | reserved | |
+| 7 | reserved | |
 |8 | Uninferrable call | JALR rd, rs +
                                     +
                         C.JALR rs | rd = `link` and rs != `link` +
@@ -263,7 +266,7 @@ retired instruction
 |9 | Inferrable call | JAL rd +
                        C.JAL +
                        CM.JALT| rd = `link` +
-                                Expands to `JAL x1, offset` +
+                                Expands to: JAL x1, offset +
                                 Defined by <<zcmt,Zcmt>> extension
 |10 | Uninferrable jump +
       (without linkage) | JALR rd, rs +
@@ -272,17 +275,16 @@ retired instruction
 |11 | Inferrable jump | JAL rd +
                         C.J +
                         CM.JT| rd = *x0* +
-                               Expands to `JAL x0, offset` +
+                               Expands to: JAL x0, offset +
                                Defined by <<zcmt,Zcmt>> extension
 |12 | Co-routine swap | JALR rd, rs +
                         C.JALR rs| rd = `link` and rs = `link` and rd != rs +
                                    rs = *x5* +
-|13 | Return +
-      Pop/return | JALR rd, rs +
-                   C.JR rs +
-                   CM.POPRET| rd != `link` and rs = `link` +
-                              rs = `link` +
-                              Defined by *Zcmt* extension
+|13 | Return | JALR rd, rs +
+               C.JR rs +
+               CM.POPRET| rd != `link` and rs = `link` +
+                          rs = `link` +
+                          Defined by *Zcmt* extension
 |14 | Other uninferrable jump (with linkage) | JALR rd, rs | rd != `link` and rd != *x0* and rs != `link` +
 |15 | Other inferrable jump (without linkage) | JAL rd | rd != `link` and rd != *x0*
 |===
@@ -493,14 +495,13 @@ infrastructure).
 ==== Using trigger outputs from the Debug Module
 
 The debug module of the RISC-V hart may have a trigger unit. This
-defines a match control register (*_mcontrol_*) containing a 4-bit
-*action* field, and reserves codes 2 - 5 of this field for trace use.
+defines several trigger CSRs (for example `mcontrol6`, `icount`, etc.) that contain a 4-bit *action* field.  Codes 2 - 5 of this field are for trace use.
 These action codes are hereby defined as shown in table
 <<tab:debugModuleTriggerSupport>>. If implemented, each action must generate a pulse on an output from the hart, on the same cycle as the instruction which caused the trigger is
 retired.
 
 [[tab:debugModuleTriggerSupport]]
-.Debug Module trigger support (*_mcontrol_ action*)
+.Debug Module trigger support (*action*)
 [%autowidth,align="center",float="center",cols="<,<",options="header"]
 |===
 | *Value* | *Description*
@@ -564,7 +565,7 @@ and CSR. Support for both atomic and CSR accesses are independently
 optional.
 
 The signalling protocol can take one of two forms, depending on the
-needs of the RISC-V hart: _unified_ or _split_.
+needs of the RISC-V hart: _unified_ or _split_.  A hart is expected to provide one of these forms, not both simultaneously.
 
 Unified is the simplest form, suitable for simpler, in-order harts. In
 this form, all information about a data access is signalled by the
@@ -575,75 +576,17 @@ For harts with out of order or speculative execution capabilities, many
 loads may be in progress simultaneously, and this approach is not
 practical as it would require the hart to maintain a large amount of
 state relating to all the in-progress loads. For this reason, the
-interface also supports splitting loads into two parts:
+interface also supports splitting loads, atomic and CSR accesses into two parts:
 
-* The _request_ phase provides all the information about the load that
+* The _request_ phase provides all the information about the access that
 originates from the hart (address, size, etc.) when the instruction
 retires;
-* The _response_ phase provides the data and response status when it has
+* The _response_ phase provides the load data and response status when it has
 been returned to the hart from the memory system.
 
 The two parts of a split load are associated by use of a transaction ID.
 
-The Zc (code-size reduction) extension introduced push and pop
-instructions (_cm.push_, _cm.pop_, _cm.popret_ and _cm.popretz_) that
-each result in multiple loads or stores. To allow the resulting loads or
-stores to be associated with the correct instruction, these
-multi-memory-access instructions (and any other future instructions with
-similar characteristics) must be reported on the instruction trace
-interface multiple times (once for each individual load or store) using
-*itype* 0 except for the final load or store, which must retire using
-the natural *itype* for the instruction (for example, a _cm.popret_
-instruction must use *itype* 13 for the final load to signal the
-return). The instruction address reported will be the same for each
-occurrence.
-
-The following illustrations show the retirement sequences when a single
-_cm.push_ or _cm.popret_ is used to push or pop 4 registers from the
-stack. They assume a RISC-V to encoder interface that can report a block
-of 1 or more retired instructions and one load or store per cycle. Each
-comprises 4 elements, and shows the instruction information reported for
-each load and store. As detailed in section
-<<sec:InstructionTraceInterface>>, this takes the form of the address
-of an instruction, the length of the block (1 for a single instruction)
-and the type of the last instruction in the block. In each element,
-’Block’ indicates a block of 1 or more instructions (i.e. could also be
-a single instruction), whereas ’Single’ indicates a single instruction
-(i.e. a block with a length of 1).
-
-A _cm.push_ is equivalent to 4 store instructions:
-
-. Block - last instruction is _cm.push_, *itype* 0 (data trace interface
-reports 1st store);
-. Single - _cm.push_, *itype* 0 (data trace interface reports 2nd
-store);
-. Single - _cm.push_, *itype* 0 (data trace interface reports 3rd
-store);
-. Block - 1st instruction is _cm.push_, *itype* dependent on last
-instruction in block (data trace interface reports 4th store);
-
-A _cm.popret_ is equivalent to 4 loads and a return:
-
-. Block - last instruction is _cm.popret_, *itype* 0 (data trace
-interface reports 1st load);
-. Single - _cm.popret_, *itype* 0 (data trace interface reports 2nd
-load);
-. Single - _cm.popret_, *itype* 0 (data trace interface reports 3rd
-load);
-. Single - _cm.popret_, *itype* 13 (data trace interface reports 4th
-load);
-
-If an exception occurs part way through the sequence of loads or stores
-initiated by such an instruction, and the instruction is re-executed
-after the exception handler has been serviced, the load or store
-sequence must recommence from the beginning.
-
-[NOTE]
-====
-This is required for data trace only. If data trace is not
-implemented, the push or pop may instead be reported just once in the
-normal way when all associated loads or stores complete successfully.
-====
+For CSR accesses, the _request_ and _response_ phases should occur simultaneously.
 
 [[sec:DataTraceInterface]]
 === Data Trace Interface
@@ -685,7 +628,7 @@ instruction address. Required if _retires_p_ > 1
 access instruction is retired. Required if there are replicated
 instruction block signals
 |*lrid*[_lrid_width_p_-1:0] | S | Load request ID. Valid when *dretire*
-is high
+is high.  Ignored if *dtype* indicates a store.
 |*lresp*[_lresp_width_p_-1:0] | S | Load response: +
 0: None +
 1: reserved +
@@ -694,7 +637,7 @@ is high
 |*lid*[_lrid_width_p_-1:0] | S | Split Load ID. Valid when *lresp* is
 non-zero
 |*sdata*[_sdata_width_p_-1:0] | S | Store data. Valid when *dretire* is
-high and access is a store (*dtype* is 1) or atomic (*dtype* is 8 - 14).
+high and access is a store (*dtype* is 1 or 3) or atomic (*dtype* is 8 - 14).
 |*ldata*[_ldata_width_p_-1:0] | S | Load data. Valid when *lresp* is
 non-zero
 |===
@@ -708,12 +651,12 @@ non-zero
 | *Value* | *Description*
 |0| Load
 |1 | Store
-|2 | reserved
-|3 | reserved
+|2 | Multi-memory-access Load
+|3 | Multi-memory-access Store
 |4 | CSR read-write
 |5 | CSR read-set
 |6 | CSR read-clear
-|7 | reserved
+|7 | Compare and swap failure
 |8 | Atomic swap
 |9 | Atomic add
 |10 | Atomic AND
@@ -725,13 +668,9 @@ non-zero
 |===
 
 The maximum value of _dtype_width_p_ is 4. However, if only loads and
-stores are supported, _dtype_width_p_ can be 1. If CSRs are supported
-but atomics are not, _dtype_width_p_ can be 3.
+stores are supported, _dtype_width_p_ can be 1. If Multi-memory access instructions are also required, _dtype_width_p_ can be 2.  If CSRs are supported but atomics are not, _dtype_width_p_ can be 3.
 
-Atomic and CSR accesses have either both load and store data, or store
-data and an operand. For CSRs and unified atomics, both values are
-reported via *data*, with the store data in the LSBs and the load data
-or operand in the MSBs.
+Atomic and CSR accesses have load data and an operand (the actual stored data is obtained by applying the operator indicated by *dtype* to these values). When using unified signalling, both values are reported via *data*, with the operand data in the LSBs (occupying bits 0 through _data_width_p_/2 - 1) and the load data in the MSBs (occupying bits _data_width_p_/2 through _data_width_p_ - 1).  When using split signalling, the operand is reported via *sdata* and the load data via *ldata*.
 
 _lrid_width_p_ is determined by the maximum number of loads that can be
 in progress simultaneously, such that at any one time there can be no
@@ -768,8 +707,8 @@ However, that is not the case for data trace. Consider two scenarios:
 * Case 2: 1st block contains instructions 1, 2; second block contains 3,
 4, 5
 
-Given that *iretire* is non-zero in the same cycle that the data access
-retires, the encoder knows the address of the 1st and last instructions
+The signals from the <<sec:InstructionTraceInterface>> that provide details about the instruction block containing a data access instruction must be valid when *dretire* is active.
+Given this, the encoder knows the address of the 1st and last instructions
 in a block, but does not know precisely where in the block the data
 access is. In both cases, the first block matches the filtering criteria
 (it contains the address of instruction 1), and the second block does
@@ -795,3 +734,27 @@ access is associated with, so the encoder knows which block address to
 combine with the LSBs in order to construct the actual data access
 instruction address. 1 bit for 2 blocks per cycle, 2 bits for 4, and so
 on.
+
+==== Multi-memory-access Instructions
+
+[NOTE]
+====
+This section introduces a normative change from the behavior described in the E-trace spec.  This is necessary because the original behavior would result in incorrect N-Trace instruction trace.  It could also result in misleading E-Trace instruction trace when one of these instructions traps part way through.
+
+The previous requirement to report multi-access instructions as retired multiple times (once for each load or store) is withdrawn.  They should be reported as retired only once in the same way as any other instruction.
+====
+The Zcmp and Vector extensions include instructions that result in multiple loads or stores, and other future extensions may add other instructions with similar characteristics.  It is not practical for the hart to provide information about all the loads or stores initiated by such an instruction simultenously when the instruction retires; it must be provided for each load or store in turn as it completes.  This means that load/store information for these instructions is provided to the decoder before the instruction itself retires.  This in turn means that *dretire* will be active when *iretire* is not, and this requires that the signals from the <<sec:InstructionTraceInterface>> that provide details about the instruction that are normally defined to be valid when *iretire* is non-zero must also be valid when *dretire* is 1.
+
+These multi-memory-access instructions may be interrupted part-way through their access sequence, or a trap may occur on one of the accesses.  This can lead to difficulties correlating the data and instruction trace streams.  Consider the following situation:
+
+* Instruction "X" retires;
+* A vector store that performs 4 stores starts executing;
+* 2 stores are completed and then a trap occurs on the 3rd store;
+* The trap handler includes a least one store;
+* On returning from the trap handler, the vector store instruction resumes, performs the remaining stores and then retires.
+
+The program flow decoded from the instruction trace stream will show that a trap occurred following instruction "X", with the vector store following the trap handler return.  On the other hand, the data trace stream will have the 2 vector stores that occured before the trap, then the stores and loads from the trap handler, then the remaining vector stores.  It can be seen here that the order of the stores in the data trace stream does not match the order of store retirements in the instruction trace stream.
+
+In order to allow the decoder to resolve ordering issues such as this, and correlate the loads and stores with the correct instruction, loads or stores from multi-memory-access instructions are identified using dedicated *dtype* encodings.  On encountering these loads or stores in the data trace stream, the decoder must set these aside in a stack-like structure until a multi-access load or store instruction is encountered in the instruction trace stream.  It can then correlate the appropriate number of the most recent multi-memory-access loads or stores with the instruction.
+
+Some multi-access instructions restart from the beginning following a trap, and this complicates the correlation process, but such repeat loads or stores can be identified from their addresses.  For example, a _cm.push_ instruction that performs 4 stores interrupted after the 2nd store will result in a sequence of 6 stores at addresses A, A+1, A, A+1, A+2, A+3.  This will only happen when the multi-access load/store retires immediately after a *ret, and the number of repeated accesses can be determined from the addressing pattern.
