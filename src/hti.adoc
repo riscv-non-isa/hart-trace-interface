@@ -13,18 +13,17 @@ The following information is mandatory:
 
 * The number of instructions that are being retired;
 * Whether there has been an exception or interrupt, and if so the cause
-(from the *_scause/vscause/mcause_* etc. CSR) and trap value (from the
-*_stval/vstval/mtval_* etc. CSR).
+(from the `scause`/`vscause`/`mcause` etc. CSR) and trap value (from the `stval`/`vstval`/`mtval` etc. CSR).
 +
 The register set to output should be the set that is updated as a result
 of the exception (i.e. the set associated with the privilege level
 immediately following the exception);
 * The current privilege level of the RISC-V hart;
-* The _instruction_type_ of retired instructions for:
+* The instruction type of retired instructions for:
 ** Jumps with a target that cannot be inferred from the source code;
 ** Taken and non-taken branches;
 ** Return from exception or interrupt (*_*ret_* instructions).
-* The _instruction_address_ for:
+* The instruction address for:
 ** Jumps with a target that _cannot_ be inferred from the source code;
 ** The instruction retired immediately after a jump with a target that
 _cannot_ be inferred from the source code (also referred to as the
@@ -77,7 +76,7 @@ instruction which loads the target into a register have been traced.
 [[JumpClasses]]
 ==== Jump classification and target inference
 
-Jumps are classified as _inferrable_, or _uninferrable_. An _inferrable_
+Jumps are classified as _inferrable_ or _uninferrable_. An _inferrable_
 jump has a target which can be deduced from the binary executable or
 representation thereof (e.g. ELF). For the purposes of this
 specification, the following strict definition applies:
@@ -164,10 +163,10 @@ BR group signals instead.
 |*itype*[_itype_width_p_-1:0] | MR | Termination type of the instruction
 block. Encoding given in <<tab:itype3>> and <<tab:itype4>>.
 |*cause*[_ecause_width_p_-1:0] | M | Exception or interrupt cause
-(*_scause/ vscause/mcause_*). Ignored unless **itype**=1 or 2.
+(`scause`/ `vscause`/`mcause`). Ignored unless **itype**=1 or 2.
 |*tval*[_iaddress_width_p_-1:0] | M | The associated trap value, e.g. the
 faulting virtual address for address exceptions, as would be written to
-the *stval/vstval/mtval* CSR. Future optional extensions may
+the `stval`/`vstval`/`mtval` CSR. Future optional extensions may
 define *tval* to provide ancillary information in cases where it
 currently supplies zero. Ignored unless **itype**=1.
 |*priv*[_privilege_width_p_-1:0] | M | Privilege level for all
@@ -267,7 +266,7 @@ retired instruction
 |9 | Inferrable call | JAL rd +
                        C.JAL +
                        CM.JALT| rd = `link` +
-                                Expands to `JAL x1, offset` +
+                                Expands to: JAL x1, offset +
                                 Defined by <<zcmt,Zcmt>> extension
 |10 | Uninferrable jump +
       (without linkage) | JALR rd, rs +
@@ -276,7 +275,7 @@ retired instruction
 |11 | Inferrable jump | JAL rd +
                         C.J +
                         CM.JT| rd = *x0* +
-                               Expands to `JAL x0, offset` +
+                               Expands to: JAL x0, offset +
                                Defined by <<zcmt,Zcmt>> extension
 |12 | Co-routine swap | JALR rd, rs +
                         C.JALR rs| rd = `link` and rs = `link` and rd != rs +
@@ -496,14 +495,13 @@ infrastructure).
 ==== Using trigger outputs from the Debug Module
 
 The debug module of the RISC-V hart may have a trigger unit. This
-defines a match control register (*_mcontrol_*) containing a 4-bit
-*action* field, and reserves codes 2 - 5 of this field for trace use.
+defines several trigger CSRs (for example `mcontrol6`, `icount`, etc.) that contain a 4-bit *action* field.  Codes 2 - 5 of this field are for trace use.
 These action codes are hereby defined as shown in table
 <<tab:debugModuleTriggerSupport>>. If implemented, each action must generate a pulse on an output from the hart, on the same cycle as the instruction which caused the trigger is
 retired.
 
 [[tab:debugModuleTriggerSupport]]
-.Debug Module trigger support (*_mcontrol_ action*)
+.Debug Module trigger support (*action*)
 [%autowidth,align="center",float="center",cols="<,<",options="header"]
 |===
 | *Value* | *Description*
