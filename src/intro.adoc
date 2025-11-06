@@ -15,9 +15,9 @@ flow
 the encoder and reconstructs the execution flow of the code executed by
 the RISC-V hart
 * *discontinuity*: a change in the program counter that is anything other than an automatic increment to the next instruction located contiguously in memory
-- *inferrable discontinuity*: a discontinuity in the program counter resulting from a branch or *direct jump*
-- *uninferrable discontinuity*: a discontinuity in the program counter that is not inferrable (see above)
-- *updiscon*: contraction of ’uninferrable PC discontinuity’
+- *inferable discontinuity*: a discontinuity in the program counter resulting from a branch or *direct jump*
+- *uninferable discontinuity*: a discontinuity in the program counter that is not inferable (see above)
+- *updiscon*: contraction of ’uninferable PC discontinuity’
 * *E-Trace*: Abbreviation of _Efficient Trace for RISC-V_
 * *ELF*: executable and linkable format
 * *encoder*: a piece of hardware that takes in instruction execution
@@ -36,9 +36,9 @@ flow
 execution flow by changing the PC by a constant value
 - *indirect jump*: an instruction which unconditionally changes the
 execution flow by changing the PC to a computed value
-- *inferrable jump*: a jump where the target address is supplied via a
+- *inferable jump*: a jump where the target address is supplied via a
 constant embedded within the jump opcode
-- *uninferrable jump*: a jump which is not inferrable (see above)
+- *uninferable jump*: a jump which is not inferable (see above)
 * *LSB*: least significant bit
 * *MSB*: most significant bit
 * *packet*: the atomic unit of encoded trace information emitted by the
