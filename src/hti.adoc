@@ -263,7 +263,7 @@ retired instruction
                         C.JALR rs | rd = `link` and rs != `link` +
                                     rd = `link` and rs = `link` and rd = rs +
                                     rs != *x5*
-|9 | Inferrable call | JAL rd +
+|9 | Inferable call  | JAL rd +
                        C.JAL +
                        CM.JALT| rd = `link` +
                                 Expands to: JAL x1, offset +
@@ -272,7 +272,7 @@ retired instruction
       (without linkage) | JALR rd, rs +
                           C.JR rs    | rd = *x0* and rs != `link` +
                                        rs != `link` +
-|11 | Inferrable jump | JAL rd +
+|11 | Inferable jump  | JAL rd +
                         C.J +
                         CM.JT| rd = *x0* +
                                Expands to: JAL x0, offset +
@@ -334,8 +334,8 @@ block.
 (6) is used to indicate all uninferrable jumps. This is simpler to
 implement, but precludes use of the implicit return mode (see
 <<impret,Implicit Return>>), which requires jump types to be fully classified.
-Note that when _itype_width_p_ is 3, *itype* = 0 is used for inferrable calls.
-However, inferrable calls must still be the last instruction retired in a
+Note that when _itype_width_p_ is 3, *itype* = 0 is used for inferable calls.
+However, inferable calls must still be the last instruction retired in a
 block, otherwise the block would not be comprised of contiguous instructions.
 
 Whilst *iaddr* is typically a virtual address, it does not affect the
