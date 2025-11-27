@@ -319,7 +319,7 @@ NOTE: Jump instructions (CM.JT and CM.JALT) defined by ratified *Zcmt* extension
 The information presented in a block represents a contiguous sequence of
 instructions starting at *iaddr*, all of which retired in the same
 cycle. Note if *itype* is 1 or 2 (indicating an exception or an
-interrupt), the number of instructions retired may be zero. *cause* is only defined if *itype* is 1 or 2, and and
+interrupt), the number of instructions retired may be zero. *cause* is only defined if *itype* is 1 or 2, and
 *tval* if *itype* is 1. If **iretire**=0 and
 **itype**=0, the values of all other signals are undefined.
 
