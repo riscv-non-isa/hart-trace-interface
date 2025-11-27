@@ -569,8 +569,7 @@ needs of the RISC-V hart: _unified_ or _split_.  A hart is expected to provide o
 
 Unified is the simplest form, suitable for simpler, in-order harts. In
 this form, all information about a data access is signalled by the
-RISC-V hart in the same cycle that the associated data access
-instruction is reported on the instruction trace interface.
+RISC-V hart in the same cycle.  This is also the cycle that the associated data access instruction is reported as retired on the instruction trace interface, except for multi-memory access instructions - see <<sec:MMAInst>>.
 
 For harts with out of order or speculative execution capabilities, many
 loads may be in progress simultaneously, and this approach is not
@@ -579,8 +578,7 @@ state relating to all the in-progress loads. For this reason, the
 interface also supports splitting loads, atomic and CSR accesses into two parts:
 
 * The _request_ phase provides all the information about the access that
-originates from the hart (address, size, etc.) when the instruction
-retires;
+originates from the hart (address, size, etc.), and is valid in the same cycle the instruction retires, except for multi-memory access instructions;
 * The _response_ phase provides the load data and response status when it has
 been returned to the hart from the memory system.
 
@@ -735,6 +733,7 @@ combine with the LSBs in order to construct the actual data access
 instruction address. 1 bit for 2 blocks per cycle, 2 bits for 4, and so
 on.
 
+[[sec:MMAInst]]
 ==== Multi-memory-access Instructions
 
 [NOTE]
@@ -743,7 +742,7 @@ This section introduces a normative change from the behavior described in the E-
 
 The previous requirement to report multi-access instructions as retired multiple times (once for each load or store) is withdrawn.  They should be reported as retired only once in the same way as any other instruction.
 ====
-The Zcmp and Vector extensions include instructions that result in multiple loads or stores, and other future extensions may add other instructions with similar characteristics.  It is not practical for the hart to provide information about all the loads or stores initiated by such an instruction simultenously when the instruction retires; it must be provided for each load or store in turn as it completes.  This means that load/store information for these instructions is provided to the decoder before the instruction itself retires.  This in turn means that *dretire* will be active when *iretire* is not, and this requires that the signals from the <<sec:InstructionTraceInterface>> that provide details about the instruction that are normally defined to be valid when *iretire* is non-zero must also be valid when *dretire* is 1.
+The Zcmp and Vector extensions include instructions that result in multiple loads or stores, and other future extensions may add other instructions with similar characteristics.  It is not practical for the hart to provide information about all the loads or stores initiated by such an instruction simultenously when the instruction retires; it must be provided for each load or store in turn as it completes.  This means that load/store information for these instructions is provided to the decoder before the instruction itself retires.  This in turn means that *dretire* will be active when *iretire* is not, and this requires that the signals from the <<sec:InstructionTraceInterface>> that provide details about the instruction that are normally defined to be valid when *iretire* is non-zero must also be valid when *dretire* is 1.  The final load/store initiated by the instruction must be reported at the same time as the instruction retires (i.e. *dretire* and *iretire* active simultaneously).
 
 These multi-memory-access instructions may be interrupted part-way through their access sequence, or a trap may occur on one of the accesses.  This can lead to difficulties correlating the data and instruction trace streams.  Consider the following situation:
 
