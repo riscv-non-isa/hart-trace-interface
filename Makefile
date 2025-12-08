@@ -17,7 +17,7 @@ DOCS := \
 
 
 DATE ?= $(shell date +%Y-%m-%d)
-VERSION ?= v0.8.0
+VERSION ?= v0.8.1
 REVMARK ?= Draft
 DOCKER_IMG := riscvintl/riscv-docs-base-container-image:latest
 ifneq ($(SKIP_DOCKER),true)
