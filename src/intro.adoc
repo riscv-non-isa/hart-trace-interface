@@ -14,8 +14,11 @@ flow
 * *decoder*: a piece of software that takes the trace packets emitted by
 the encoder and reconstructs the execution flow of the code executed by
 the RISC-V hart
-* *discontinuity*: another name for ’delta’ (see above)
-* *E-Trace*: Abbreviation of _Efficient Trace for RISC-V_.
+* *discontinuity*: a change in the program counter that is anything other than an automatic increment to the next instruction located contiguously in memory
+- *inferable discontinuity*: a discontinuity in the program counter resulting from a branch or *direct jump*
+- *uninferable discontinuity*: a discontinuity in the program counter that is not inferable (see above)
+- *updiscon*: contraction of ’uninferable PC discontinuity’
+* *E-Trace*: Abbreviation of _Efficient Trace for RISC-V_
 * *ELF*: executable and linkable format
 * *encoder*: a piece of hardware that takes in instruction execution
 information from a RISC-V hart and transforms it into trace packets
@@ -29,13 +32,13 @@ hart to experience an unexpected transfer of control
 * *ISA*: instruction set architecture
 * *jump*: an instruction which unconditionally changes the execution
 flow
-* *direct jump*: an instruction which unconditionally changes the
+- *direct jump*: an instruction which unconditionally changes the
 execution flow by changing the PC by a constant value
-* *indirect jump*: an instruction which unconditionally changes the
+- *indirect jump*: an instruction which unconditionally changes the
 execution flow by changing the PC to a computed value
-* *inferable jump*: a jump where the target address is supplied via a
+- *inferable jump*: a jump where the target address is supplied via a
 constant embedded within the jump opcode
-* *uninferable jump*: a jump which is not inferable (see above)
+- *uninferable jump*: a jump which is not inferable (see above)
 * *LSB*: least significant bit
 * *MSB*: most significant bit
 * *packet*: the atomic unit of encoded trace information emitted by the
@@ -49,15 +52,16 @@ machine state is updated (sometimes referred to as ’commit’ or
 * *RHTI* RISC-V Hart to Trace Encoder Interface (this specification)
 * *trap*: the transfer of control to a trap handler caused by either an
 exception or an interrupt
-* *updiscon*: contraction of ’uninferable PC discontinuity’
+
 
 === Nomenclature
 
 In the following sections items in *bold* are signals or fields within a
 packet.
 
-Items in *_bold italics_* are mnemonics for instructions or CSRs defined
-in the RISC-V ISA
+Items in *_bold italics_* are mnemonics for instructions defined in the RISC-V ISA
+
+Items `lowlighted` are CSRs or other registers defined in the RISC-V ISA
 
 Items in _italics_ with names ending _’_p’_ refer to parameters either
 built into the hardware or configurable hardware values.
