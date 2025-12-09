@@ -235,7 +235,8 @@ retired instruction
      Return | JALR rd, rs +
               C.JALR rs +
               C.JR rs +
-              CM.POPRET| Uninferable jump +
+              CM.POPRET +
+              CM.POPRETZ| Uninferable jump +
               +
               +
               Defined by *Zcmt* extension
@@ -282,7 +283,8 @@ retired instruction
                                    rs = *x5* +
 |13 | Return | JALR rd, rs +
                C.JR rs +
-               CM.POPRET| rd != `link` and rs = `link` +
+               CM.POPRET +
+               CM.POPRETZ| rd != `link` and rs = `link` +
                           rs = `link` +
                           Defined by *Zcmt* extension
 |14 | Other uninferable jump (with linkage) | JALR rd, rs | rd != `link` and rd != *x0* and rs != `link` +
