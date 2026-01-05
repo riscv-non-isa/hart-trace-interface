@@ -1,10 +1,14 @@
 ---
 name: Create Specification Document
 
-# The workflow is triggered by pull request, push to main, and manual dispatch.
+# The workflow is triggered by pull request, push to main/tags, and manual dispatch.
 on:
   workflow_dispatch:
     inputs:
+      version:
+        description: Release version (e.g. v0.8.1 or 0.8.1). Leave blank to auto-increment.
+        required: false
+        type: string
       revision_mark:
         description: 'Set revision mark as Draft, Release or Stable:'
         required: true
@@ -29,6 +33,11 @@ on:
   push:
     branches:
       - main
+    tags:
+      - '*'
+  release:
+    types:
+      - published
 
 jobs:
   build:
@@ -40,6 +49,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+          fetch-depth: 0
 
       - name: Get next version
         uses: reecetech/version-increment@2024.4.4
@@ -47,17 +57,36 @@ jobs:
         with:
           scheme: semver
           increment: patch
+      - name: Resolve version and revision mark
+        shell: bash
+        run: |
+          raw_version=""
+          if [[ "${GITHUB_EVENT_NAME}" == "release" ]]; then
+            raw_version="${{ github.event.release.tag_name }}"
+          elif [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            raw_version="${GITHUB_REF_NAME}"
+          elif [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" && -n "${{ github.event.inputs.version }}" ]]; then
+            raw_version="${{ github.event.inputs.version }}"
+          else
+            raw_version="${{ steps.version.outputs.version }}"
+          fi
+          if [[ -z "$raw_version" ]]; then
+            raw_version="0.0.0"
+          fi
+          if [[ "$raw_version" == v* ]]; then
+            version="$raw_version"
+          else
+            version="v${raw_version}"
+          fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+          echo "VERSION_NO_V=${version#v}" >> "$GITHUB_ENV"
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            echo "REVMARK=${{ github.event.inputs.revision_mark }}" >> "$GITHUB_ENV"
+          fi
 
       # Pull the latest RISC-V Docs container image
       - name: Pull Container
         run: docker pull riscvintl/riscv-docs-base-container-image:latest
-
-      # # Override VERSION and REVMARK for manual workflow dispatch
-      # - name: Update environment variables
-      #   run: |
-      #     echo "VERSION=v${{ steps.version.outputs.version }}" >> "$GITHUB_ENV"
-      #     echo "REVMARK=${{ github.event.inputs.revision_mark }}" >> "$GITHUB_ENV"
-      #   if: github.event_name == 'workflow_dispatch'
 
       # Build Files
       - name: Build Files
@@ -87,16 +116,25 @@ jobs:
           path: ${{ github.workspace }}/build/hart-trace-interface.html
           retention-days: 7
 
-      # Create Release
+      # Create Release (manual workflow only)
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: ${{ github.workspace }}/build/*.pdf
-          tag_name: v${{ steps.version.outputs.version }}
-          name: Release ${{ steps.version.outputs.version }}
+          tag_name: ${{ env.VERSION }}
+          name: Release ${{ env.VERSION_NO_V }}
           draft: ${{ github.event.inputs.draft }}
           prerelease: ${{ github.event.inputs.prerelease }}
         env:
           GITHUB_TOKEN: ${{ secrets.GHTOKEN }}
         if: github.event_name == 'workflow_dispatch'
-        # This condition ensures this step only runs for workflow_dispatch events.
+
+      # Upload assets to an existing release (release event)
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ github.workspace }}/build/*.pdf
+          tag_name: ${{ env.VERSION }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GHTOKEN }}
+        if: github.event_name == 'release'
