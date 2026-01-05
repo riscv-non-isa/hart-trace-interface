@@ -203,7 +203,7 @@ discussed subsequently in <<sec:single-retire>>.
 |*iretire*[_iretire_width_p_-1:0] | BR | Number of halfwords represented
 by instructions retired in this block.
 |*ilastsize*[_ilastsize_width_p_-1:0] | BR | The size of the last retired
-instruction is 2^*ilastsize*^ half-words.
+instruction is 2^*ilastsize*^ half-words. Ignored if *iretire* is 0.
 |===
 
 [[tab:single-ingress]]
@@ -214,7 +214,7 @@ instruction is 2^*ilastsize*^ half-words.
 |*iretire*[0:0] | SR | Number of instructions retired in this block (0 or
 1).
 |*ilastsize*[_ilastsize_width_p-1_:0] | SR | The size of the last retired
-instruction in this block is 2^*ilastsize*^ half-words.
+instruction in this block is 2^*ilastsize*^ half-words.  Ignored if *iretire* is 0.
 |===
 
 [[tab:itype3]]
