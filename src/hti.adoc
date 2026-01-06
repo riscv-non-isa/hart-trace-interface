@@ -219,7 +219,7 @@ instruction in this block is 2^*ilastsize*^ half-words.  Ignored if *iretire* is
 
 [[tab:itype3]]
 .Instruction Type (*itype*) encoding (_itype_width_p_ = 3)
-[align="center",float="center",cols="<7%,<22%,<13%,~",options="header"]
+[align="center",float="center",cols="<7%,<22%,<14%,~",options="header"]
 |===
 | *Value* | *Name* | *Instruction* | *Condition/Notes*
 | 0 |Other | | Last instruction in the block matches none of the other instructions defined in this table
@@ -235,8 +235,10 @@ retired instruction
      Return | JALR rd, rs +
               C.JALR rs +
               C.JR rs +
+              +
               CM.POPRET +
               CM.POPRETZ| Uninferable jump +
+              +
               +
               +
               Defined by *Zcmt* extension
@@ -245,7 +247,7 @@ retired instruction
 
 [[tab:itype4]]
 .Instruction Type (*itype*) encoding (_itype_width_p_ = 4)
-[align="center",float="center",cols="<7%,<22%,<13%,~",options="header"]
+[align="center",float="center",cols="<7%,<22%,<14%,~",options="header"]
 |===
 | *Value* | *Name* | *Instruction* | *Condition/Notes*
 | 0 |Other | | Last instruction in the block matches none of the other instructions defined in this table
@@ -261,8 +263,10 @@ retired instruction
 | 7 | reserved | |
 |8 | Uninferable call | JALR rd, rs +
                                     +
+                                    +
                         C.JALR rs | rd = `link` and rs != `link` +
                                     rd = `link` and rs = `link` and rd = rs +
+                                    +
                                     rs != *x5*
 |9 | Inferable call  | JAL rd +
                        C.JAL +
@@ -283,9 +287,11 @@ retired instruction
                                    rs = *x5* +
 |13 | Return | JALR rd, rs +
                C.JR rs +
+               +
                CM.POPRET +
                CM.POPRETZ| rd != `link` and rs = `link` +
                           rs = `link` +
+                          +
                           Defined by *Zcmt* extension
 |14 | Other uninferable jump (with linkage) | JALR rd, rs | rd != `link` and rd != *x0* and rs != `link` +
 |15 | Other inferable jump (without linkage) | JAL rd | rd != `link` and rd != *x0*
