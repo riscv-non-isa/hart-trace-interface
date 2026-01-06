@@ -15,8 +15,7 @@ This chapter specifies the following standard extensions to the base Hart to Tra
 The *halted* signal defined in <<tab:ingress-side-band, Optional sideband encoder input signals>> provides a mechanism to inhibit tracing whilst the hart is in Debug mode.  However, since this was defined, other conditions that require similar behaviour have been identified:
 
 * Inhibiting trace for security reasons;
-
-* Pausing trace for a potentially unbounded amount of time.
+* Pausing trace for an unbounded amount of time.
 
 To accomplish this, the *halted* signal is replaced with the multi-bit *trcstate* signal defined below:
 
