@@ -294,7 +294,6 @@ retired instruction
                           +
                           Defined by *Zcmp* extension
                           +
-                          Defined by *Zcmp* extension
 |14 | Other uninferable jump (with linkage) | JALR rd, rs | rd != `link` and rd != *x0* and rs != `link` +
 |15 | Other inferable jump (without linkage) | JAL rd | rd != `link` and rd != *x0*
 |===
