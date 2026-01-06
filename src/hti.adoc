@@ -673,7 +673,7 @@ stores are supported, _dtype_width_p_ can be 1. If Multi-memory access instructi
 
 Atomic and CSR accesses have load data and an operand (the actual stored data is obtained by applying the operator indicated by *dtype* to these values). When using unified signalling, both values are reported via *data*, with the operand data in the LSBs (occupying bits 0 through _data_width_p_/2 - 1) and the load data in the MSBs (occupying bits _data_width_p_/2 through _data_width_p_ - 1).  When using split signalling, the operand is reported via *sdata* and the load data via *ldata*.
 
-Store conditional (SC) and Compare-and-swap (CAS) instructions both perform stores only if some condition is met.  The decoder needs to be made aware of this in order to be able to correctly associate store packets in the data trace stream with the correct instruction.
+Store conditional (SC) and Compare-and-swap (CAS) instructions both perform stores only if some condition is met.  When a store is not performed, the decoder needs to be made aware in order to be able to correctly associate store packets in the data trace stream with the correct instruction.
 
 * SC and CAS instructions where the condition is met and the store occurs are reported using *dtype* codes 1 and 8 respectively;
 * SC and CAS instructions where the condition is not met and no store occurs are reported using *dtype* codes 15 and 7 respectively.
