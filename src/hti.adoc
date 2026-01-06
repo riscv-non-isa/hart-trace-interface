@@ -241,7 +241,7 @@ retired instruction
               +
               +
               +
-              Defined by *Zcmt* extension
+              Defined by *Zcmp* extension
 |7 | reserved | |
 |===
 
@@ -272,7 +272,7 @@ retired instruction
                        C.JAL +
                        CM.JALT| rd = `link` +
                                 Expands to: JAL x1, offset +
-                                Defined by <<zcmt,Zcmt>> extension
+                                Defined by <<zcmp,Zcmp>> extension
 |10 | Uninferable jump +
       (without linkage) | JALR rd, rs +
                           C.JR rs    | rd = *x0* and rs != `link` +
@@ -281,7 +281,7 @@ retired instruction
                         C.J +
                         CM.JT| rd = *x0* +
                                Expands to: JAL x0, offset +
-                               Defined by <<zcmt,Zcmt>> extension
+                               Defined by <<zcmp,Zcmp>> extension
 |12 | Co-routine swap | JALR rd, rs +
                         C.JALR rs| rd = `link` and rs = `link` and rd != rs +
                                    rs = *x5* +
@@ -292,7 +292,8 @@ retired instruction
                CM.POPRETZ| rd != `link` and rs = `link` +
                           rs = `link` +
                           +
-                          Defined by *Zcmt* extension
+                          Defined by *Zcmp* extension
+                          +
 |14 | Other uninferable jump (with linkage) | JALR rd, rs | rd != `link` and rd != *x0* and rs != `link` +
 |15 | Other inferable jump (without linkage) | JAL rd | rd != `link` and rd != *x0*
 |===
@@ -304,8 +305,8 @@ NOTE: Branches (*itype*=4, 5) are always conditional, direct branches. In RISC-V
 [[link]]
 NOTE: Symbol `link` means register *x1* or *x5* as specified in *The RISC-V Instruction Set Manual, Volume I: Unprivileged ISA* document.
 
-[[zcmt]]
-NOTE: Jump instructions (CM.JT and CM.JALT) defined by ratified *Zcmt* extension are handled as direct (inferable) jumps as jump tables are assumed to be static and known to the decoder.
+[[zcmp]]
+NOTE: Jump instructions (CM.JT and CM.JALT) defined by ratified *Zcmp* extension are handled as direct (inferable) jumps as jump tables are assumed to be static and known to the decoder.
 
 <<<
 
@@ -479,7 +480,7 @@ encoder to stop tracing until further notice. See <<sec:trigger>>).
 packet containing the information the decoder requires in order to determine the final instruction retired before halting (e.g. the address of that instruction, or the instruction count since the last reported instruction), then indicate that tracing has stopped. Upon deassertion, the encoder will start tracing again,
 commencing with a synchronization packet. *Note:* If this signal is not
 provided, it is strongly recommended that Debug mode can be signalled
-via a 3-bit *privilege* signal. This will allow tracing in Debug mode to
+via the *priv* signal. This will allow tracing in Debug mode to
 be controlled via the optional filtering capabilities. +
 (This signal has been superseded by the <<sec:trcstate, *Trace State*>> extension.)
 |*reset* | O | Hart is in reset. Provided the encoder is in a different
@@ -678,6 +679,11 @@ The maximum value of _dtype_width_p_ is 4. However, if only loads and
 stores are supported, _dtype_width_p_ can be 1. If Multi-memory access instructions are also required, _dtype_width_p_ can be 2.  If CSRs are supported but atomics are not, _dtype_width_p_ can be 3.
 
 Atomic and CSR accesses have load data and an operand (the actual stored data is obtained by applying the operator indicated by *dtype* to these values). When using unified signalling, both values are reported via *data*, with the operand data in the LSBs (occupying bits 0 through _data_width_p_/2 - 1) and the load data in the MSBs (occupying bits _data_width_p_/2 through _data_width_p_ - 1).  When using split signalling, the operand is reported via *sdata* and the load data via *ldata*.
+
+Store conditional (SC) and Compare-and-swap (CAS) instructions both perform stores only if some condition is met.  When a store is not performed, the decoder needs to be made aware in order to be able to correctly associate store packets in the data trace stream with the correct instruction.
+
+* SC and CAS instructions where the condition is met and the store occurs are reported using *dtype* codes 1 and 8 respectively;
+* SC and CAS instructions where the condition is not met and no store occurs are reported using *dtype* codes 15 and 7 respectively.
 
 _lrid_width_p_ is determined by the maximum number of loads that can be
 in progress simultaneously, such that at any one time there can be no
