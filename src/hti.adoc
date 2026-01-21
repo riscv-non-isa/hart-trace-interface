@@ -645,7 +645,7 @@ is high.  Ignored if *dtype* indicates a store.
 |*lid*[_lrid_width_p_-1:0] | S | Split Load ID. Valid when *lresp* is
 non-zero
 |*sdata*[_sdata_width_p_-1:0] | S | Store data. Valid when *dretire* is
-high and access is a store (*dtype* is 1 or 3) or atomic (*dtype* is 8 - 14).
+high and access is a store (*dtype* is 1 or 3), CSR (*dtype* is 4 - 6) or atomic (*dtype* is 8 - 14).
 |*ldata*[_ldata_width_p_-1:0] | S | Load data. Valid when *lresp* is
 non-zero
 |===
