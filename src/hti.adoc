@@ -545,8 +545,8 @@ is sometimes known as a watchpoint.
 Debug module triggers may activate from one or more of the loads or stores initiated by an MMA instruction.  Furthermore, MMA instructions may be interrupted or faulted before completion, and after returning from the trap may resume where they left off, or re-execute in their entirety. However, the *trigger* signals are only considered when an instruction retires.
 
 * For an MMA instruction that executes to retirement without interuption, the hart must ensure all triggers initiated during the MMA instruction are output on the trigger signals when the instruction retires
-* For an MMA instruction that traps part way through, and which will re-execute from the beginning on returning from the trap, any triggers occuring before the trap must be discarded (they will re-occur when the instruction re-executes).
-* For an MMA instruction that traps part way through, and which will resume from where it left off on returning from the trap, any triggers occuring before the trap must be output along with the trap, as there is no mechanism for the hart to store this trigger state.
+* For an MMA instruction that traps part way through, and which will re-execute from the beginning on returning from the trap, any triggers occuring before the trap must be discarded (they will re-occur when the instruction re-executes).  This applies to all Zcmp instructions.
+* For an MMA instruction that traps part way through, and which is likely to resume from where it left off on returning from the trap, any triggers occuring before the trap must be output along with the trap, as there is no mechanism for the hart to store this trigger state.
 
 There are also considerations for the trace encoder when starting trace via a _trace-on_ trigger on an MMA instruction  - see <<sec:MMAInst>>.
 
