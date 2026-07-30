@@ -47,7 +47,7 @@ encoder
 * *program counter*: a register containing the address of the
 instruction being executed
 * *retire*: the final stage of executing an instruction, when the
-machine state is updated (sometimes referred to as ’commit’ or
+machine state is updated and the `minstret` CSR is updated (sometimes referred to as ’commit’ or
 ’graduate’)
 * *RHTI* RISC-V Hart to Trace Encoder Interface (this specification)
 * *trap*: the transfer of control to a trap handler caused by either an
