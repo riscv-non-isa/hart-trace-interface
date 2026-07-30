@@ -41,6 +41,7 @@ constant embedded within the jump opcode
 - *uninferable jump*: a jump which is not inferable (see above)
 * *LSB*: least significant bit
 * *MSB*: most significant bit
+* *Multi-memory access (MMA) instruction*: An instruction such as those introduced by the Zcmp and Vector extensions that results in multiple loads or stores
 * *packet*: the atomic unit of encoded trace information emitted by the
 encoder
 * *PC*: program counter
@@ -50,6 +51,8 @@ instruction being executed
 machine state is updated and the `minstret` CSR is updated (sometimes referred to as ’commit’ or
 ’graduate’)
 * *RHTI* RISC-V Hart to Trace Encoder Interface (this specification)
+* *trace decoder*: see *decoder*
+* *trace encoder*: seee *encoder*
 * *trap*: the transfer of control to a trap handler caused by either an
 exception or an interrupt
 
