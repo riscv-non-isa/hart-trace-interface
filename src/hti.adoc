@@ -539,6 +539,18 @@ Trace-notify provides means to ensure that a specified instruction is
 explicitly reported (subject to any optional filtering). This capability
 is sometimes known as a watchpoint.
 
+[[sec:mmatrigger]]
+===== Considerations for triggering from multi-memory access instructions
+
+Debug module triggers may activate from one or more of the loads or stores initiated by an MMA instruction.  Furthermore, MMA instructions may be interrupted or faulted before completion, and after returning from the trap may resume where they left off, or re-execute in their entirety. However, the *trigger* signals are only considered when an instruction retires.
+
+* For an MMA instruction that executes to retirement without interuption, the hart must ensure all triggers initiated during the MMA instruction are output on the trigger signals when the instruction retires
+* For an MMA instruction that traps part way through, and which will re-execute from the beginning on returning from the trap, any triggers occuring before the trap must be discarded (they will re-occur when the instruction re-executes).
+* For an MMA instruction that traps part way through, and which will resume from where it left off on returning from the trap, any triggers occuring before the trap must be output along with the trap, as there is no mechanism for the hart to store this trigger state.
+
+There are also considerations for the trace encoder when starting trace via a _trace-on_ trigger on an MMA instruction  - see <<sec:MMAInst>>.
+
+
 ==== Example retirement sequences
 
 .Example 1 : 9 Instructions retired over four cycles, 2 branches
@@ -772,3 +784,5 @@ The program flow decoded from the instruction trace stream will show that a trap
 In order to allow the decoder to resolve ordering issues such as this, and correlate the loads and stores with the correct instruction, loads or stores from multi-memory-access instructions are identified using dedicated *dtype* encodings.  On encountering these loads or stores in the data trace stream, the decoder must set these aside in a stack-like structure until a multi-access load or store instruction is encountered in the instruction trace stream.  It can then correlate the appropriate number of the most recent multi-memory-access loads or stores with the instruction.
 
 Some multi-access instructions restart from the beginning following a trap, and this complicates the correlation process, but such repeat loads or stores can be identified from their addresses.  For example, a _cm.push_ instruction that performs 4 stores that faults after the 2nd store will result in a sequence of 6 stores at addresses A, A+1, A, A+1, A+2, A+3.  This will only happen when the multi-access load/store retires immediately after a *ret, and the number of repeated accesses can be determined from the addressing pattern.
+
+Special consideration is also needed if data trace is enabled and tracing starts on the cycle that an MMA instruction retires is enabled.  The start could be initiated by software, a _trace-on_ trigger, filter qualification etc.).  When tracing starts, the instructions retired in that cycle along with any loads or stores reported in that cycle are included in the trace stream.  The final load or store in an MMA instruction may occur at the same time that the instruction retires, or may be earlier.  Enabling trace on the cycle that the MMA retires means there may be one or none of the loads or stores of that instruction included in the data trace stream, and this indeterminism presents difficulties for correlating the instruction and data trace streams during decoding.  To avoid this, if an MMA instruction is in progress (MMA loads or stores observed via *dretires* and *dtype* but instruction not retired), tracing must not be enabled until after the MMA retires.  The effect of this will be to delay the start of trace by one cycle.  But it ensures all retired MMA instructions in the instruction trace stream will be accompanied by a full set of loads/stores in the data trace stream.

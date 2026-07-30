@@ -41,6 +41,7 @@ constant embedded within the jump opcode
 - *uninferable jump*: a jump which is not inferable (see above)
 * *LSB*: least significant bit
 * *MSB*: most significant bit
+* *Multi-memory access (MMA) instruction*: An instruction such as those introduced by the Zcmp and Vector extensions that results in multiple loads or stores
 * *packet*: the atomic unit of encoded trace information emitted by the
 encoder
 * *PC*: program counter
