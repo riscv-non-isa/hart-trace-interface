@@ -51,6 +51,8 @@ instruction being executed
 machine state is updated (sometimes referred to as ’commit’ or
 ’graduate’)
 * *RHTI* RISC-V Hart to Trace Encoder Interface (this specification)
+* *trace decoder*: see *decoder*
+* *trace encoder*: seee *encoder*
 * *trap*: the transfer of control to a trap handler caused by either an
 exception or an interrupt
 
